@@ -1,0 +1,29 @@
+#!/bin/bash -e
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+if [ -z "${ws_parent}" ]; then
+    ws_parent=$(pwd)
+
+    read -p "Using ${ws_parent} as a parent directory for catkin workspaces, are you sure? " -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        exit
+    fi
+fi
+mkdir -p "${ws_parent}"
+
+if [ -z "${rosdep}" ]; then
+    rosdep=n
+fi
+echo "rosdep=${rosdep}"
+
+extend=/opt/ros/noetic \
+    ros=noetic \
+    rosdep=${rosdep} \
+    rosinstall="${dir}/../config/ros.rosinstall" \
+    install="${ws_parent}/robolab" \
+    "${dir}/setup_catkin_workspace" "$(mktemp -d)"
+
+apt-get clean

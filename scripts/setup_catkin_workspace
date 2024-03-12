@@ -1,0 +1,103 @@
+#!/bin/bash
+set -e
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+usage="Setup robolab catkin workspace at specified directory.
+
+Usage:
+    setup_catkin_workspace [<workspace>]
+
+Options (environmental variables):
+- extend:       Workspace to extend.
+- ros:          ROS distribution (kinetic/melodic).
+- rosdep:       Install dependencies via rosdep? [y/n]
+- rosinstall:   Workspace rosinstall files.
+- install:      Path to install space. Don't install if not provided.
+"
+
+# Parse arguments.
+if [ "$#" -gt 1 ]; then
+    echo 'ERROR: Invalid number of arguments.'
+    echo
+    echo "${usage}"
+    exit 1
+fi
+
+# Workspace
+if [ "$#" -eq 1 ]; then
+    ws="$1"
+fi
+if [ ! "${ws}" ]; then
+    ws="$(pwd)"
+fi
+if [ ! "${ws}" ]; then
+    echo 'ERROR: Workspace not specified.'
+    exit 2
+fi
+ws=$(realpath "${ws}")
+echo "Workspace: ${ws}"
+
+# ROS distribution
+if [ ! "${ros}" ] && [ -d /opt/ros/melodic ]; then
+    ros=melodic
+fi
+if [ ! "${ros}" ] && [ -d /opt/ros/kinetic ]; then
+    ros=kinetic
+fi
+if [ ! "${ros}" ]; then
+    echo 'ERROR: No ROS distribution found.'
+    exit 3
+fi
+echo "ROS distribution: ${ros}"
+
+# Extended workspace
+if [ ! "${extend}" ]; then
+    extend=/opt/ros/$ros
+fi
+extend=$(realpath "${extend}")
+if [ ! "${extend}" ]; then
+    echo 'ERROR: Extended workspace not specified.'
+    exit 4
+fi
+echo "Extended workspace: ${extend}"
+
+# Workspace rosinstall files
+if [ ! "${rosinstall}" ]; then
+    rosinstall="${dir}/../config/robolab.rosinstall ${dir}/../config/robolab_${ros}.rosinstall"
+fi
+if [ ! "${rosinstall}" ]; then
+    echo 'ERROR: Workspace configuration rosinstall files not specified.'
+    exit 5
+fi
+echo "Workspace rosinstall files: ${rosinstall}"
+
+# Configure main repositories from provided rosinstall files.
+mkdir -p "${ws}/src"
+cd "${ws}/src"
+wstool init
+# Keep first entry with given key (-k).
+# Make sure there are no duplicates in these curated lists.
+for f in ${rosinstall}; do
+    wstool merge -k ${f}
+    wstool up -j 8
+done
+
+# Install rosdep dependencies.
+if [ "${rosdep}" = "y" ]; then
+    cd "${ws}"
+    rosdep update
+    rosdep install --from-paths src --ignore-src --rosdistro ${ros} -r -y
+fi
+
+# Initialize, configure, and build catkin workspace.
+cd "${ws}"
+catkin init
+catkin config --extend "${extend}"
+catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+if [ "${install}" ]; then
+    catkin config -i "${install}" --install
+fi
+if ! catkin build -c; then
+    echo 'ERROR: Catkin build incomplete!'
+    exit 1
+fi

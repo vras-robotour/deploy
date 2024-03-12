@@ -1,0 +1,4 @@
+singularity_file: images/robotour.sif
+log_file: logs/robotour.log
+definition_file: robotour.def
+workspace_repo: https...

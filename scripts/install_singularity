@@ -1,0 +1,33 @@
+#!/bin/bash -e
+
+if [ -n "$SINGULARITY_NAME" ]; then
+	echo "Cannot run install_singularity from inside Singularity."
+	exit 1
+fi
+
+if which singularity >/dev/null; then
+	echo "Singularity is already installed"
+	exit 0
+fi
+
+error_msg="Cannot automatically install Singularity on this system (only Ubuntu is supported).
+Follow the official install guide at https://apptainer.org/admin-docs/master/installation.html , 
+or you can try directly installing from the Apptainer releases page: https://github.com/apptainer/apptainer/releases ."
+
+if ! which dpkg-query >/dev/null; then
+	echo -e "$error_msg"
+	exit 1
+fi
+
+if [[ "$(dpkg-query --show --showformat='${db:Status-Status}\n' singularity-ce)" == "installed" ]] || [[ "$(dpkg-query --show --showformat='${db:Status-Status}\n' apptainer)" == "installed" ]]; then
+	echo "Singularity is already installed"
+	exit 0
+fi
+
+echo "Installing Singularity. Be prepared to type your sudo password and press [Enter] for adding the PPA."
+if (sudo add-apt-repository ppa:peci1/singularity-ce-v3 && sudo apt install singularity-ce); then
+	echo "Singularity installed"
+else
+	echo -e "Install failed.\n$error_msg"
+	exit 1
+fi
