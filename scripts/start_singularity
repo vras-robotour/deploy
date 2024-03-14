@@ -1,65 +1,83 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -eo pipefail  # Better error handling and exiting on error
 
-# get the path to this script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-REPO_PATH="$(cd "$SCRIPT_DIR/.." && pwd)"
-ROOT_PATH="$(cd "$REPO_PATH/.." && pwd)"
+SCRIPTS_PATH=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
+PROJECT_PATH=$(realpath "$SCRIPTS_PATH/..")
+ROOT_PATH=$(realpath "$PROJECT_PATH/..")
 
-. "$SCRIPT_DIR/utils.sh"
+source "$SCRIPTS_PATH/utils.sh"
 
-IS_TURTLE_OR_LAB_DESKTOP=0
-IMAGE="$REPO_PATH/images/robotour.simg"
+IMAGE_NAME="robotour.simg"
+IMAGE_PATH="${PROJECT_PATH}/images/${IMAGE_NAME}"
 
-# Try to mount /local directory on lab PCs and robots if not already mounted
-[ -d /local ] && findmnt --fstab /local >/dev/null && ! findmnt -M /local >/dev/null && mount /local >/dev/null
-if [ -f /local/robolab_noetic.simg ]; then
-	IS_TURTLE_OR_LAB_DESKTOP=1
-	IMAGE=/local/robolab_noetic.simg
-fi
+ENV_VARIABLES=(
+    ROS_MASTER_URI
+    ROS_HOSTNAME
+    ROS_IP
+    ROS_HOME
+    ROS_LOG_DIR
+    ROSCONSOLE_CONFIG_FILE
+    ROS_PYTHON_LOG_CONFIG_FILE
+    HOSTNAME
+    DISPLAY
+    USER
+    XAUTHORITY
+    LANG
+    DBUS_SESSION_BUS_ADDRESS
+)
 
-if is_online; then
-	echo "Updating repository"
-	(cd "$REPO_PATH" && git pull)
-fi
+update_repository() {
+    if is_online; then
+        echo "Updating repository"
+        (cd "$PROJECT_PATH" && git pull)
+    fi
+}
 
 # If you have NVidia GPU and rendering acceleration doesn't work for you, call `export ARO_SINGULARITY_NV=1` before
 # launching this script. However, this only works on Ubuntu 20.04 and older systems.
-nv=""
-[ "$ARO_SINGULARITY_NV" = "1" ] && nv="--nv"
+set_nvidia_gpu() {
+    nv=""
+    if [ "$ARO_SINGULARITY_NV" = "1" ]; then
+        echo "Setting up NVidia GPU support."
+        nv="--nv"
+    fi
+}
 
-if [ "$SINGULARITY_NAME" = "robotour.simg" ]; then
-	echo "You can not start new singularity container from within another singularity container."
-	echo "Initializing ARO workspace within current session instead."
-	"$SCRIPT_DIR"/initialize_workspace "$@"
-else
-	# If the computer is online, try to update the image (but not on lab machines, their update mechanism is different).
-  #	[ "$IS_TURTLE_OR_LAB_DESKTOP" = "0" ] && is_online && "$SCRIPT_DIR"/download_singularity_image
+bind_directories() {
+    bind="${ROOT_PATH}:${ROOT_PATH}"
+    if [ -d /snap ]; then
+      echo "Mounting /snap directory."
+      bind="${bind},/snap:/snap"
+    fi
+}
 
-	# Check whether singularity is installed.
-	"$SCRIPT_DIR"/install_singularity
+main() {
+    # Accept argument -u or --update to update the image
+    if [ "${1:-}" = "-u" ] || [ "${1:-}" = "--update" ]; then
+      echo "Updating the image."
+      is_online && "$SCRIPTS_PATH"/download_singularity_image
+    fi
 
-  . "$SCRIPT_DIR/utils.sh"
+    # If in singularity container exit
+    in_singularity && echo "You are already inside a singularity container." && exit 1
 
-  # Set the PS1 prompt
-  export SINGULARITYENV_PS1="${IN_NIX_SHELL:+[nix-shell:${IN_NIX_SHELL}] }"'\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[1;33m\]$(parse_git_branch)$(detect_singularity) \[\033[01;34m\]\$\[\033[00m\] '
+    # Check whether singularity is installed and install it if not
+    "${SCRIPTS_PATH}"/install_singularity
 
-	# Only these environment variables will be passed to the container. This prevents clobbering of PYTHONPATH etc.
-  export SINGULARITYENV_PS1="\[\033[01;32m\]\u@\h\[\033[00m\]\[\e[33m\][AROSingularity]\[\e[0m\]:\[\033[01;34m\]\w\[\033[00m\]$ "
-	[ -n "$ROS_MASTER_URI" ] && export SINGULARITYENV_ROS_MASTER_URI="$ROS_MASTER_URI"
-	[ -n "$ROS_HOSTNAME" ] && export SINGULARITYENV_ROS_HOSTNAME="$ROS_HOSTNAME"
-	[ -n "$ROS_IP" ] && export SINGULARITYENV_ROS_IP="$ROS_IP"
-	[ -n "$ROS_HOME" ] && export SINGULARITYENV_ROS_HOME="$ROS_HOME"
-	[ -n "$ROS_LOG_DIR" ] && export SINGULARITYENV_ROS_LOG_DIR="$ROS_LOG_DIR"
-	[ -n "$ROSCONSOLE_CONFIG_FILE" ] && export SINGULARITYENV_ROSCONSOLE_CONFIG_FILE="$ROSCONSOLE_CONFIG_FILE"
-	[ -n "$ROS_PYTHON_LOG_CONFIG_FILE" ] && export SINGULARITYENV_ROS_PYTHON_LOG_CONFIG_FILE="$ROS_PYTHON_LOG_CONFIG_FILE"
-	[ -n "$HOSTNAME" ] && export SINGULARITYENV_HOSTNAME="$HOSTNAME"
-	[ -n "$DISPLAY" ] && export SINGULARITYENV_DISPLAY="$DISPLAY"
-	[ -n "$USER" ] && export SINGULARITYENV_USER="$USER"
-	[ -n "$XAUTHORITY" ] && export SINGULARITYENV_XAUTHORITY="$XAUTHORITY"
-	[ -n "$LANG" ] && export SINGULARITYENV_LANG="$LANG"
-	[ -n "$DBUS_SESSION_BUS_ADDRESS" ] && export SINGULARITYENV_DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS"
+    update_repository
 
-	echo "Starting Singularity container from image $IMAGE ."
-	singularity exec $nv --bind /snap:/snap -e -B "$ROOT_PATH" "$IMAGE" "$SCRIPT_DIR/initialize_workspace" "$@"
-fi
+    bind_directories
+    set_nvidia_gpu
 
+    export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]\[\e[33m\] [RoboTour] \[\e[0m\]:\[\033[01;34m\]\w\[\033[00m\]$ "
+
+    for var_name in "${ENV_VARIABLES[@]}"; do
+        export_environment_variable_if_present "$var_name"
+    done
+
+    echo "Starting Singularity container from image ${IMAGE_PATH}."
+    singularity exec -e -B "${ROOT_PATH}" "${IMAGE_PATH}" "${SCRIPTS_PATH}/initialize_workspace" "$@"
+}
+
+# Execute main function
+main "$@"

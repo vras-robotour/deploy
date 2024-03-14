@@ -1,103 +1,123 @@
-#!/bin/bash
-set -e
-dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+#!/usr/bin/env bash
+set -euo pipefail  # Better error handling and exiting on error
 
-usage="Setup robolab catkin workspace at specified directory.
+# Function to print usage information
+print_usage() {
+    cat <<EOF
+Setup Catkin workspace at specified directory.
 
 Usage:
     setup_catkin_workspace [<workspace>]
 
-Options (environmental variables):
-- extend:       Workspace to extend.
-- ros:          ROS distribution (kinetic/melodic).
-- rosdep:       Install dependencies via rosdep? [y/n]
-- rosinstall:   Workspace rosinstall files.
-- install:      Path to install space. Don't install if not provided.
-"
+Options:
+- -e|--extend:       Workspace to extend.
+- -r|--ros:          ROS distribution (kinetic/melodic/noetic).
+- -d|--rosdep:       Install dependencies via rosdep? [y/n]
+- -i|--rosinstall:   Workspace rosinstall files.
+- -p|--install:      Path to install space. Don't install if not provided.
+EOF
+}
 
-# Parse arguments.
-if [ "$#" -gt 1 ]; then
-    echo 'ERROR: Invalid number of arguments.'
-    echo
-    echo "${usage}"
+# Function to handle errors and exit
+handle_error() {
+    echo "ERROR: $1" >&2
     exit 1
-fi
+}
 
-# Workspace
-if [ "$#" -eq 1 ]; then
-    ws="$1"
-fi
-if [ ! "${ws}" ]; then
-    ws="$(pwd)"
-fi
-if [ ! "${ws}" ]; then
-    echo 'ERROR: Workspace not specified.'
-    exit 2
-fi
-ws=$(realpath "${ws}")
-echo "Workspace: ${ws}"
+# Function to configure main repositories from provided rosinstall files
+configure_repositories() {
+    mkdir -p "${workspace}/src"
+    cd "${workspace}/src" || handle_error "Failed to navigate to ${workspace}/src"
+    wstool init
 
-# ROS distribution
-if [ ! "${ros}" ] && [ -d /opt/ros/melodic ]; then
-    ros=melodic
-fi
-if [ ! "${ros}" ] && [ -d /opt/ros/kinetic ]; then
-    ros=kinetic
-fi
-if [ ! "${ros}" ]; then
-    echo 'ERROR: No ROS distribution found.'
-    exit 3
-fi
-echo "ROS distribution: ${ros}"
-
-# Extended workspace
-if [ ! "${extend}" ]; then
-    extend=/opt/ros/$ros
-fi
-extend=$(realpath "${extend}")
-if [ ! "${extend}" ]; then
-    echo 'ERROR: Extended workspace not specified.'
-    exit 4
-fi
-echo "Extended workspace: ${extend}"
-
-# Workspace rosinstall files
-if [ ! "${rosinstall}" ]; then
-    rosinstall="${dir}/../config/robolab.rosinstall ${dir}/../config/robolab_${ros}.rosinstall"
-fi
-if [ ! "${rosinstall}" ]; then
-    echo 'ERROR: Workspace configuration rosinstall files not specified.'
-    exit 5
-fi
-echo "Workspace rosinstall files: ${rosinstall}"
-
-# Configure main repositories from provided rosinstall files.
-mkdir -p "${ws}/src"
-cd "${ws}/src"
-wstool init
-# Keep first entry with given key (-k).
-# Make sure there are no duplicates in these curated lists.
-for f in ${rosinstall}; do
-    wstool merge -k ${f}
+    # Merge provided rosinstall files
+    for file in "${rosinstall[@]}"; do
+        [ -e "$file" ] && wstool merge -k "$file"
+    done
     wstool up -j 8
-done
+}
 
-# Install rosdep dependencies.
-if [ "${rosdep}" = "y" ]; then
-    cd "${ws}"
-    rosdep update
-    rosdep install --from-paths src --ignore-src --rosdistro ${ros} -r -y
-fi
+# Function to install ROS dependencies using rosdep
+install_ros_dependencies() {
+    if [ "${rosdep}" = "y" ]; then
+        rosdep update
+        rosdep install --from-paths "${workspace}/src" --ignore-src --rosdistro "${ros}" -r -y
+    fi
+}
 
-# Initialize, configure, and build catkin workspace.
-cd "${ws}"
-catkin init
-catkin config --extend "${extend}"
-catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
-if [ "${install}" ]; then
-    catkin config -i "${install}" --install
-fi
-if ! catkin build -c; then
-    echo 'ERROR: Catkin build incomplete!'
-    exit 1
-fi
+# Function to initialize, configure, and build catkin workspace
+initialize_catkin_workspace() {
+    cd "${workspace}" || handle_error "Failed to navigate to ${workspace}"
+    catkin init
+    catkin config --extend "${extend}"
+    catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+    [ -n "${install}" ] && catkin config -i "${install}" --install
+    catkin build -c || handle_error "Catkin build incomplete"
+}
+
+# Main script logic
+main() {
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            -e|--extend)
+            extend="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            -r|--ros)
+            ros="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            -d|--rosdep)
+            rosdep="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            -i|--rosinstall)
+            rosinstall+=("$2")
+            shift # past argument
+            shift # past value
+            ;;
+            -p|--install)
+            install="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            *)
+            print_usage
+            handle_error "Unknown option: $1"
+            ;;
+        esac
+    done
+    workspace="${1:-$(pwd)}"  # Default to current directory if workspace not provided
+
+    echo "=================================================="
+    echo "Setting up Catkin workspace at: ${workspace}"
+    echo "=================================================="
+
+    echo "ROS distribution: ${ros}"
+    echo "Extend workspace: ${extend}"
+    echo "Install space: ${install}"
+    echo "Install dependencies: ${rosdep}"
+    echo "ROS install files: ${rosinstall[*]}"
+    echo "=================================================="
+
+    # Validate required arguments
+    if [[ -z "${ros}" ]]; then
+        handle_error "ROS distribution not provided."
+    fi
+
+    # Determine extended workspace
+    extend="${extend:-/opt/ros/${ros}}"
+
+    # Configure repositories, install dependencies, and initialize catkin workspace
+    configure_repositories
+    install_ros_dependencies
+    initialize_catkin_workspace
+}
+
+# Execute main function with arguments passed to the script
+main "$@"

@@ -1,0 +1,15 @@
+- git:
+    local-name: lar
+    uri: https://gitlab.fel.cvut.cz/robolab/lar.git
+    version: master
+
+- git:
+    local-name: turtlebot
+    uri: https://gitlab.fel.cvut.cz/robolab/turtlebot.git
+    version: melodic
+
+- git:
+    local-name: robolab_turtlebot
+    uri: https://gitlab.fel.cvut.cz/robolab/robolab_turtlebot.git
+    version: master
+

@@ -1,65 +1,51 @@
 #!/bin/bash -e
 
-# Get the directory of this script
-SCRIPTS_DIR=$(realpath "$(dirname "$0")")
+# get the path to this script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+REPO_PATH="$( cd "$SCRIPT_DIR/.." && pwd )"
+ROOT_PATH="$( cd "$REPO_PATH/.." && pwd )"
+WORKSPACE_PATH="$ROOT_PATH/workspace"
+STUDENT_PACKAGES_PATH="$WORKSPACE_PATH/src/student-packages"
 
-# Get the absolute path to the project directory
-PROJECT_DIR=$(realpath "$SCRIPTS_DIR/..")
-CONFIG_DIR="$PROJECT_DIR/config"
+. "$SCRIPT_DIR/utils.sh"
 
-# Get the absolute path to the root directory
-ROOT_DIR=$(realpath "$PROJECT_DIR/..")
-
-# Define other directories relative to the root directory
-WORKSPACE_DIR="$ROOT_DIR/robotour-ws"
-
-# Source the utils.sh script
-. "$SCRIPTS_DIR/utils.sh"
-. "$CONFIG_DIR/config.sh"
-
-
-# Check if the user is inside the ARO singularity container
-if [ "$SINGULARITY_NAME" != "$SINGULARITY_IMAGE_NAME" ]; then
-	echo "You are not inside the RoboTour singularity container."
-	echo "Please start the singularity first using start_singularity."
+if [ "$SINGULARITY_NAME" != "robotour.simg" ]; then
+	echo "You are not inside the ARO singularity container."
+	echo "Please start the singularity first using start_singularity_aro."
 	exit 1
 fi
 
-## Create the workspace if it does not exist
-#echo "Creating workspace if it does not exist in $WORKSPACE_DIR ."
-#if [ -d "$STUDENT_PACKAGES_PATH" ]; then
-#	if ! is_online; then
-#		echo "You do not seem to be online. Not updating student packages repo."
-#	else
-#		echo "Pulling new changes into the student repo in $STUDENT_PACKAGES_PATH ."
-#		cd "$STUDENT_PACKAGES_PATH"
-#		if ! git pull; then
-#			echo "Pulling teacher changes into student repo failed. You need to resolve the merge conflicts yourself to proceed."
-#			echo "Try running the following commands:"
-#			echo "cd \"$STUDENT_PACKAGES_PATH\" && git add . && git commit -m \"My changes\" && git merge origin/master"
-#			echo "If that fails and you are unable to resolve the merge conflict, please, contact the lab teachers."
-#			exit 1
-#		fi
-#	fi
-#else
-#	mkdir -p "$STUDENT_PACKAGES_PATH/.."
-#	echo "Cloning the student repo into $STUDENT_PACKAGES_PATH . All your work on ARO will be happening there."
-#	git clone https://gitlab.fel.cvut.cz/robolab/aro/student-packages "$STUDENT_PACKAGES_PATH"
-#fi
-
-if [ ! -d "$WORKSPACE_DIR" ]; then
-  echo "Creating the workspace in $WORKSPACE_DIR ."
-  mkdir -p "$WORKSPACE_DIR/src"
+echo "Creating workspace if it does not exist in $WORKSPACE_PATH ."
+if [ -d "$STUDENT_PACKAGES_PATH" ]; then
+	if ! is_online; then
+		echo "You do not seem to be online. Not updating student packages repo."
+	else
+		echo "Pulling new changes into the student repo in $STUDENT_PACKAGES_PATH ."
+		cd "$STUDENT_PACKAGES_PATH"
+		if ! git pull; then
+			echo "Pulling teacher changes into student repo failed. You need to resolve the merge conflicts yourself to proceed."
+			echo "Try running the following commands:"
+			echo "cd \"$STUDENT_PACKAGES_PATH\" && git add . && git commit -m \"My changes\" && git merge origin/master"
+			echo "If that fails and you are unable to resolve the merge conflict, please, contact the lab teachers."
+			exit 1
+		fi
+	fi
+else
+	mkdir -p "$STUDENT_PACKAGES_PATH/.."
+	echo "Cloning the student repo into $STUDENT_PACKAGES_PATH . All your work on ARO will be happening there."
+	git clone https://gitlab.fel.cvut.cz/robolab/aro/student-packages "$STUDENT_PACKAGES_PATH"
 fi
 
-cd "$WORKSPACE_DIR"
+cd "$WORKSPACE_PATH"
 
 if [ ! -d ".catkin_tools" ]; then
 	echo "Initializing your ARO ROS workspace."
 	catkin init
+	catkin config --extend /opt/ros/aro
 fi
 
-if [ ! -d build ] || [ ! -d devel ]; then
+# TODO the check for 50.aro.sh can be removed after 2024
+if [ ! -d build ] || [ ! -d devel ] || [ ! -f devel/etc/catkin/profile.d/50.aro.sh ]; then
 	echo "Building the ARO ROS workspace."
 	catkin build
 fi
@@ -69,7 +55,6 @@ if [ ! -f "$HOME"/.tmux.conf ]; then
 	echo "set-option -g default-shell /bin/bash" > "$HOME"/.tmux.conf
 fi
 
-# Start an interactive bash while sourcing the workspace
 cd "$STUDENT_PACKAGES_PATH"
 echo "Starting interactive bash while sourcing the workspace."
 if [ $# -gt 0 ]; then

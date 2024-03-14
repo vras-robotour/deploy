@@ -1,0 +1,4 @@
+- git:
+    local-name: student-packages
+    uri: https://gitlab.fel.cvut.cz/robolab/aro/student-packages.git
+    version: master

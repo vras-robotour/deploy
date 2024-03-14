@@ -12,7 +12,7 @@ cd "${BUILD_DIR}"
 
 # Ask user if he is sure about removing the old image.
 if [ -e "${IMAGE_FILE}" ]; then
-    read -p "This will remove the old image ${IMAGE_FILE}. Are you sure? " -r
+    read -p "This will remove the old image ${IMAGE_FILE}. Are you sure? [y/N] " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]
     then

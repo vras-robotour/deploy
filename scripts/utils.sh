@@ -1,3 +1,8 @@
+function handle_error() {
+    echo "ERROR: $1" >&2
+    exit 1
+}
+
 function is_online() {
 	local url="https://www.cvut.cz/sites/default/files/favicon.ico"
 	local domain="cvut.cz"
@@ -13,6 +18,17 @@ function is_online() {
 	else
 		return 0
 	fi
+}
+
+function in_singularity() {
+  [ -n "$SINGULARITY_CONTAINER" ]
+}
+
+function export_environment_variable_if_present() {
+    local var_name="$1"
+    if [ -n "${!var_name}" ]; then
+        export "SINGULARITYENV_$var_name"="${!var_name}"
+    fi
 }
 
 # include the branch name and its dirtiness in the bash prompt
