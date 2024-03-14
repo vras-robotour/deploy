@@ -90,8 +90,7 @@ main() {
             print_usage
             ;;
             *)
-            # If it's not an option, it might be the workspace argument
-            if [[ -z $workspace ]]; then
+            if [[ -z "${workspace:-}" ]]; then
                 workspace="$1"
             else
                 print_usage
@@ -103,7 +102,7 @@ main() {
     done
 
     # If workspace is not provided, use current directory
-    if [[ -z $workspace ]]; then
+    if [[ -z "${workspace}" ]]; then
         workspace=$(pwd)
     fi
 
