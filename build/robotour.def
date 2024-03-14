@@ -29,8 +29,8 @@ From: ros:noetic-perception-focal
 
     tmp="$(mktemp -d)"
     cd "${tmp}"
-    git clone https://github.com/aleskucera/robotour-singularity.git
-    cd robotour-singularity
+    git clone https://github.com/vras-robotour/deploy.git
+    cd deploy
 
     DEBIAN_FRONTEND=noninteractive xargs -a config/packages.apt apt-get install -y
 
