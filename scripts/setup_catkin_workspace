@@ -7,7 +7,7 @@ print_usage() {
 Setup Catkin workspace at specified directory.
 
 Usage:
-    setup_catkin_workspace [<workspace>]
+    setup_catkin_workspace [<options>] [<workspace>]
 
 Options:
 - -e|--extend:       Workspace to extend.
@@ -86,13 +86,26 @@ main() {
             shift # past argument
             shift # past value
             ;;
-            *)
+            -h|--help)
             print_usage
-            handle_error "Unknown option: $1"
+            ;;
+            *)
+            # If it's not an option, it might be the workspace argument
+            if [[ -z $workspace ]]; then
+                workspace="$1"
+            else
+                print_usage
+                handle_error "Unknown option: $1"
+            fi
+            shift # past argument or value
             ;;
         esac
     done
-    workspace="${1:-$(pwd)}"  # Default to current directory if workspace not provided
+
+    # If workspace is not provided, use current directory
+    if [[ -z $workspace ]]; then
+        workspace=$(pwd)
+    fi
 
     echo "=================================================="
     echo "Setting up Catkin workspace at: ${workspace}"

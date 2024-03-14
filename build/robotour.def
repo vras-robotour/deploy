@@ -34,7 +34,6 @@ From: ros:noetic-perception-focal
 
     DEBIAN_FRONTEND=noninteractive xargs -a config/packages.apt apt-get install -y
 
-    scripts/install_editors
 
     ws_parent=/opt/ros \
         rosdep=y \
