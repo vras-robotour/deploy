@@ -14,7 +14,8 @@ From: ros:noetic-perception-focal
     sudo /usr/bin/sudo
 
 %runscript
-    /opt/ros/robolab/env.sh "$@"
+    source ~/.bashrc
+    source /opt/ros/noetic/setup.bash
 
 %environment
     export XDG_RUNTIME_DIR=$(mktemp -d)  # This fixes running VSCode, PyCharm etc. because /run/user/$(id -u) is not bind-mounted by default.
@@ -33,11 +34,6 @@ From: ros:noetic-perception-focal
     cd deploy
 
     DEBIAN_FRONTEND=noninteractive xargs -a config/packages.apt apt-get install -y
-
-
-    ws_parent=/opt/ros \
-        rosdep=y \
-        scripts/setup_noetic_workspaces
 
     apt-get clean
     rm -rf "${tmp}"

@@ -101,11 +101,20 @@ main() {
         esac
     done
 
-    # If workspace is not provided, use current directory
-    if [[ -z "${workspace}" ]]; then
-        workspace=$(pwd)
+    workspace="${workspace:$(pwd)}"
+    extend="${extend:-/opt/ros/${ros}}"
+
+    if [ -z "${ros}" ] && [ -d /opt/ros/noetic ]; then
+        ros=noetic
+    elif [ -z "${ros}" ] && [ -d /opt/ros/melodic ]; then
+        ros=melodic
+    elif [ -z "${ros}" ] && [ -d /opt/ros/kinetic ]; then
+        ros=kinetic
+    else
+        handle_error "ROS distribution not found"
     fi
 
+    echo
     echo "=================================================="
     echo "Setting up Catkin workspace at: ${workspace}"
     echo "=================================================="
@@ -116,14 +125,7 @@ main() {
     echo "Install dependencies: ${rosdep}"
     echo "ROS install files: ${rosinstall[*]}"
     echo "=================================================="
-
-    # Validate required arguments
-    if [[ -z "${ros}" ]]; then
-        handle_error "ROS distribution not provided."
-    fi
-
-    # Determine extended workspace
-    extend="${extend:-/opt/ros/${ros}}"
+    echo
 
     # Configure repositories, install dependencies, and initialize catkin workspace
     configure_repositories
