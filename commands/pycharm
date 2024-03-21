@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+SNAP_PYCHARM=/snap/pycharm-professional/current/bin/pycharm.sh
+FREE_PYCHARM=/opt/pycharm/bin/pycharm.sh
+
+if [ -f $SNAP_PYCHARM ]; then
+    $SNAP_PYCHARM
+elif [ -f $FREE_PYCHARM ]; then
+    $FREE_PYCHARM
+else
+    echo "PyCharm not found."
+fi

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+(
+  cd "${WORKSPACE_PATH}" || exit 1
+  catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3
+)

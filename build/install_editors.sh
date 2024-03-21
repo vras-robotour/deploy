@@ -21,6 +21,12 @@ install_sublimetext() {
     sudo apt-get -y install sublime-text
 }
 
+install_neovim() {
+    sudo add-apt-repository ppa:neovim-ppa/unstable
+    sudo apt update
+    sudo apt -y install neovim
+}
+
 install_pycharm() {
     if [ "$(dpkg --print-architecture)" = "arm64" ]; then
         wget --quiet https://download-cdn.jetbrains.com/python/pycharm-community-2023.3.3-aarch64.tar.gz
@@ -28,7 +34,7 @@ install_pycharm() {
         wget --quiet https://download-cdn.jetbrains.com/python/pycharm-community-2023.3.3.tar.gz
     fi
     sudo tar xzf pycharm-*.tar.gz --one-top-level=pycharm --strip-components=1 -C /opt/
-    sudo ln -s /opt/pycharm/bin/pycharm.sh /usr/bin/pycharm
+#    sudo ln -s /opt/pycharm/bin/pycharm.sh /usr/bin/pycharm
 }
 
 main() {

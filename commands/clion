@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+SNAP_CLION=/snap/clion/current/bin/clion.sh
+
+if [ -f $SNAP_CLION ]; then
+    $SNAP_CLION
+else
+    echo "CLion not found."
+fi

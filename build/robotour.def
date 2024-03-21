@@ -2,23 +2,27 @@ Bootstrap: docker
 From: ros:noetic-perception-focal
 
 %help
-    ROS Noetic for courses taught at Department of Cybernetics,
-    Czech Technical University in Prague.
-    The main use is for the TurtleBots in the Robolab (KN:E-130).
-    See https://gitlab.fel.cvut.cz/robolab for more information.
+    Custom Singularity container for RoboTour 2024. This container
+    is developed by the Department of Cybernetics, Czech Technical
+    University in Prague, Czech Republic.
+
+%labels
+    Version v0.0.2
 
 %setup
     [ -f "/root/.netrc" ] && cp "/root/.netrc" "${SINGULARITY_ROOTFS}/root/.netrc" || true
+    mkdir -p $SINGULARITY_ROOTFS/.custom_commands
+    mkdir -p $SINGULARITY_ROOTFS/.tmp
 
 %files
     sudo /usr/bin/sudo
-
-%runscript
-    source ~/.bashrc
-    source /opt/ros/noetic/setup.bash
+    ../commands/* /.custom_commands/
+    ./install_editors.sh /.tmp/install_editors.sh
+    ./robotour.apt /.tmp/robotour.apt
 
 %environment
     export XDG_RUNTIME_DIR=$(mktemp -d)  # This fixes running VSCode, PyCharm etc. because /run/user/$(id -u) is not bind-mounted by default.
+    export PATH="/.custom_commands:${PATH}"
 
 %post
     apt-get update -y
@@ -28,14 +32,14 @@ From: ros:noetic-perception-focal
     apt-get update -y
     DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
 
-    tmp="$(mktemp -d)"
-    cd "${tmp}"
-    git clone https://github.com/vras-robotour/deploy.git
-    cd deploy
+    bash /.tmp/install_editors.sh
+    DEBIAN_FRONTEND=noninteractive xargs -a /.tmp/robotour.apt apt-get install -y
 
-    DEBIAN_FRONTEND=noninteractive xargs -a config/packages.apt apt-get install -y
+    pip3 install torch --index-url https://download.pytorch.org/whl/cu118
+
+    chmod +x /.custom_commands/*
 
     apt-get clean
-    rm -rf "${tmp}"
     rm /root/.netrc || true
+    rm -rf /.tmp || true
     
