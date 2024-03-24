@@ -66,7 +66,7 @@ main() {
             ;;
             -u|--update)
             echo "INFO: Updating the image."
-            is_online && bash "${SCRIPTS_PATH}"/download_image
+            is_online && bash "${SCRIPTS_PATH}"/download_image.sh
             shift # past argument
             ;;
             --nv)
@@ -89,7 +89,7 @@ main() {
     in_singularity && echo "ERROR: You are already inside a singularity container." && exit 1
 
     # Check whether singularity is installed and install it if not
-    bash "${SCRIPTS_PATH}"/install_singularity
+    bash "${SCRIPTS_PATH}"/install_singularity.sh
 
     update_repository
 
@@ -104,7 +104,7 @@ main() {
     done
 
     echo "INFO: Starting Singularity container from image ${IMAGE_FILE}."
-    singularity exec $nvidia_gpu -e -B "${bind}" "${IMAGES_PATH}/${IMAGE_FILE}" "${SCRIPTS_PATH}/initialize_workspace" "$@"
+    singularity exec $nvidia_gpu -e -B "${bind}" "${IMAGES_PATH}/${IMAGE_FILE}" "${SCRIPTS_PATH}/initialize_workspace.sh" "$@"
 }
 
 # Execute main function
