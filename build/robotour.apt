@@ -63,6 +63,7 @@ ros-noetic-tf2-sensor-msgs
 ros-noetic-turtlebot3
 ros-noetic-turtlebot3-msgs
 ros-noetic-turtlebot3-simulations
+ros-noetic-geodesy
 screen
 strace
 software-properties-common

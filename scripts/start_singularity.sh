@@ -5,7 +5,7 @@ source "$(realpath "$(dirname "${BASH_SOURCE[0]}")")/utils.sh"
 
 print_usage() {
     cat <<EOF
-Start ROboTour Singularity container.
+Start RoboTour Singularity container.
 
 Usage:
     start_singularity [<options>]
