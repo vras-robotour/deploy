@@ -192,11 +192,11 @@ local_image_exists() {
 }
 
 upload_image() {
-  scp "${IMAGES_PATH}/${IMAGE_FILE}" "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/"
+  scp "${IMAGES_PATH}/${IMAGE_FILE}" "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}"
 }
 
 download_image() {
-  scp "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/" "${IMAGES_PATH}/${IMAGE_FILE}"
+  scp "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}" "${IMAGES_PATH}/${IMAGE_FILE}"
 }
 
 # ============= END: UTILITY FUNCTIONS =============
