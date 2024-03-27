@@ -64,10 +64,15 @@ main() {
             -h|--help)
             print_usage
             ;;
-            -u|--update)
+            -d|--download)
             echo "INFO: Updating the image."
             is_online && bash "${SCRIPTS_PATH}"/download_image.sh
             shift # past argument
+            ;;
+            -u|--username)
+            USERNAME="$2"
+            shift # past argument
+            shift # past value
             ;;
             --nv)
             nvidia_gpu="--nv"

@@ -52,9 +52,9 @@ LOG_FILE="${LOGS_PATH}/${BASE_NAME}.log"
 SETUP_FILE="${WORKSPACE_PATH}/devel/setup.bash"
 
 # Remote server
-USERNAME="kuceral4"
-REMOTE_IMAGES_PATH="/mnt/personal/kuceral4/robotour/images"
-REMOTE_SERVER="login3.rci.cvut.cz"
+USERNAME="${USERNAME:-$(whoami)}"
+REMOTE_IMAGES_PATH="/data/robotour2024/images"
+REMOTE_SERVER="subtdata.felk.cvut.cz"
 
 # Environment variables to be passed to the container
 PROMPT='\[\033[01;32m\]\u@\h\[\033[01;33m\] [RoboTour] \[\033[01;34m\]\w\[\033[01;33m\]$(parse_git_branch) \[\033[01;34m\]\$\[\033[00m\] '
@@ -179,7 +179,7 @@ remote image (${remote_version}). Are you sure you want to continue? [y/N] " -n 
 remote_image_exists() {
   exists=$(ssh -t ${USERNAME}@${REMOTE_SERVER} \
     "test -f ${REMOTE_IMAGES_PATH}/${IMAGE_FILE} && echo true || echo false" 2>/dev/null)
-  echo "${exists}" | tr -d '[:space:]'
+  echo "${exists}" | grep -q "true" && echo "true" || echo "false"
 }
 
 

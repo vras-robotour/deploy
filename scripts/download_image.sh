@@ -7,8 +7,30 @@ main() {
   echo
   echo "============ DOWNLOADING SINGULARITY IMAGE ============="
   echo
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+      key="$1"
+      case $key in
+          -h|--help)
+          print_usage
+          ;;
+          -u|--username)
+          USERNAME="$2"
+          shift # past argument
+          shift # past value
+          ;;
+          *)
+          print_usage
+          handle_error "Unknown option: $1"
+          shift # past argument or value
+          ;;
+      esac
+  done
+
   local_exists=$(local_image_exists)
   remote_exists=$(remote_image_exists)
+  echo "${remote_exists}"
 
   if [ "$local_exists" == "true" ]; then
     echo "INFO: Found the local image ${IMAGE_FILE}."
@@ -28,4 +50,4 @@ main() {
   download_image
 }
 
-main
+main "$@"
