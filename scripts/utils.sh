@@ -83,6 +83,7 @@ declare -A PACKAGES
 PACKAGES["test_package"]="https://github.com/vras-robotour/test_package.git"
 PACKAGES["naex"]="https://github.com/vras-robotour/naex.git"
 PACKAGES["map_data"]="https://github.com/vras-robotour/map_data.git"
+PACKAGES["robotour"]="https://github.com/vras-robotour/robotour.git"
 
 # ============= END: VARIABLES =============
 
