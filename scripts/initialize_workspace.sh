@@ -28,6 +28,7 @@ update_packages() {
 }
 
 start_bash() {
+  cd "${WORKSPACE_PATH}"
   echo "INFO: Starting interactive bash while sourcing the workspace."
   echo
   if [ $# -gt 0 ]; then
