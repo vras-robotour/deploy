@@ -35,5 +35,3 @@ This will build the singularity image and save it to the `images` directory. Nex
 ```bash
 bash scripts/upload_image.sh
 ```
-
-
