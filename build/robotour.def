@@ -36,6 +36,7 @@ From: ros:noetic-perception-focal
     DEBIAN_FRONTEND=noninteractive xargs -a /.tmp/robotour.apt apt-get install -y
 
     pip3 install torch --index-url https://download.pytorch.org/whl/cu118
+    pip3 install overpy gpxpy utm gpxpy
 
     chmod +x /.custom_commands/*
 
