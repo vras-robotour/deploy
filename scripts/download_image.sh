@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail  # Better error handling and exiting on error
 
+print_usage() {
+    cat <<EOF
+Download RoboTour Singularity image. The image will be downloaded from
+the login3.rci.cvut.cz server. Please provide your username if it
+differs from your current username.
+
+The script will compare the versions of the local and remote images and
+interactively walk you through the download process.
+
+Usage:
+    bash download_image.sh [<options>]
+
+Options:
+    -h|--help:  Print this help message.
+    -u|--username <username>:  Username as which to download the image from the RCI server.
+EOF
+}
+
 source "$(realpath "$(dirname "${BASH_SOURCE[0]}")")/utils.sh"
 
 main() {

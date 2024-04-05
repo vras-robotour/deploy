@@ -1,5 +1,13 @@
 #!/bin/bash
 
+print_usage() {
+    cat <<EOF
+Initialize the catkin workspace for the RoboTour project. This script should
+not be run directly. Instead, use the start_singularity.sh script to start the
+singularity container and then run this script inside the container.
+EOF
+}
+
 source "$(realpath "$(dirname "${BASH_SOURCE[0]}")")/utils.sh"
 
 init_workspace() {
@@ -28,7 +36,7 @@ update_packages() {
 }
 
 start_bash() {
-  cd "${WORKSPACE_PATH}"
+  cd "${WORKSPACE_PATH}" || exit 1
   echo "INFO: Starting interactive bash while sourcing the workspace."
   echo
   if [ $# -gt 0 ]; then

@@ -1,6 +1,42 @@
 # RoboTour Singularity Deployment Scripts
 
-This repository contains the deployment scripts for the Singularity container of the RoboTour project.
+This repository contains the deployment scripts for the Singularity container of the RoboTour project. The documentation contains following sections:
+
+- [Repository structure](#repository-structure)
+- [How to use](#how-to-use)
+- [Commands in container](#commands-in-container)
+
+## Repository structure
+
+The repository contains the following directories and files:
+
+```
+├── build
+│   ├── robotour.apt
+│   ├── robotour.def
+│   └── ...
+├── commands
+│   ├── build_workspace
+│   ├── clion
+│   ├── pycharm
+│   ├── source_noetic
+│   ├── source_workspace
+│   └── ...
+├── images
+├── logs
+└── scripts
+    ├── build_image.sh
+    ├── download_image.sh
+    ├── start_singularity.sh
+    ├── upload_image.sh
+    └── ...
+```
+
+- `build` - contains the Singularity definition files for building the container and the apt file with the dependencies. If you want to add new dependencies, you have to add them to the apt file.
+- `commands` - contains the scripts that are used in the container. The scripts are used to build the workspace, start the IDEs, and source the workspace.
+- `images` - contains the built or downloaded Singularity images.
+- `logs` - contains the logs from building the container.
+- `scripts` - contains the scripts for building, downloading, starting, and uploading the Singularity container. Each script has a `help` option that shows the usage of the script. You can run the script with the `help` option by running the script with the `-h` or `--help` option.
 
 ## How to use
 

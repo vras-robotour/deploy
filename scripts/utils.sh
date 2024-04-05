@@ -115,8 +115,6 @@ in_singularity() {
   [ -n "$SINGULARITY_CONTAINER" ]
 }
 
-
-
 get_remote_image_version() {
     remote_version=$(ssh -t ${USERNAME}@${REMOTE_SERVER} \
         "cd ${REMOTE_IMAGES_PATH}; \
@@ -137,14 +135,14 @@ compare_versions_for_upload() {
 
     if [[ "$local_version" == "$remote_version" ]]; then
         # Versions are equal
-        read -p "INPUT: The remote image is already up to date (${local_version}). Do you want to continue? [y/N] " -n 1 -r
+        read -p "INPUT: The remote image is already up to date (${local_version}). Do you want to continue? [y/N] "
     elif [[ "$(echo -e "$local_version\n$remote_version" | sort -V | tail -n1)" == "$local_version" ]]; then
         # Local version is strictly newer
         read -p "INPUT: This upload will overwrite the old remote image (${remote_version}) with newer
-local image (${local_version}). Are you sure you want to continue? [y/N] " -n 1 -r
+local image (${local_version}). Are you sure you want to continue? [y/N] "
     else
         # Remote version is strictly newer
-        read -p "INPUT: The remote image (${remote_version}) is newer than the local one (${local_version}). Do you want to continue? [y/N] " -n 1 -r
+        read -p "INPUT: The remote image (${remote_version}) is newer than the local one (${local_version}). Do you want to continue? [y/N] "
     fi
 
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -160,14 +158,14 @@ compare_versions_for_download() {
 
   if [[ "$local_version" == "$remote_version" ]]; then
       # Versions are equal
-      read -p "INPUT: The local image is already up to date (${local_version}). Do you want to continue? [y/N] " -n 1 -r
+      read -p "INPUT: The local image is already up to date (${local_version}). Do you want to continue? [y/N] "
   elif [[ "$(echo -e "$local_version\n$remote_version" | sort -V | tail -n1)" == "$local_version" ]]; then
       # Local version is strictly newer
-      read -p "INPUT: The local image is newer (${local_version}) than the remote one (${remote_version}). Do you want to continue? [y/N] " -n 1 -r
+      read -p "INPUT: The local image is newer (${local_version}) than the remote one (${remote_version}). Do you want to continue? [y/N] "
   else
       # Remote version is strictly newer
       read -p "INPUT: This download will overwrite the old local image (${local_version}) with newer
-remote image (${remote_version}). Are you sure you want to continue? [y/N] " -n 1 -r
+remote image (${remote_version}). Are you sure you want to continue? [y/N] "
   fi
 
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then

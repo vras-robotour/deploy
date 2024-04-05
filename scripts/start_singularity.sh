@@ -5,15 +5,25 @@ source "$(realpath "$(dirname "${BASH_SOURCE[0]}")")/utils.sh"
 
 print_usage() {
     cat <<EOF
-Start RoboTour Singularity container.
+Start RoboTour Singularity container. This script will do the following:
+
+1. Check if the script is run inside a singularity container and exit if it is.
+2. Check if singularity is installed and install it if it is not.
+3. Update the deployment repository to the latest version.
+4. Download the image if requested. (Use the -d or --download option)
+5. Bind the necessary directories.
+6. Set up the NVidia GPU support if requested. (Use the --nv option)
+7. Export the necessary environment variables.
+8. Start the singularity container using initialize_workspace.sh script.
 
 Usage:
     start_singularity [<options>]
 
 Options:
     -h|--help:  Print this help message.
-    -u|--update: Update the image before starting the container.
-    --nv:        Enable NVidia GPU support.
+    -d|--download:  Update the image before starting the container.
+    -u|--username <username>:  Username as which to start the container.
+    --nv:        Enable NVIDIA GPU support.
 EOF
 }
 
@@ -57,6 +67,7 @@ export_environment_variable_if_present() {
 
 main() {
     nvidia_gpu=""
+    download_image=false
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         key="$1"
@@ -65,8 +76,7 @@ main() {
             print_usage
             ;;
             -d|--download)
-            echo "INFO: Updating the image."
-            is_online && bash "${SCRIPTS_PATH}"/download_image.sh
+            download_image=true
             shift # past argument
             ;;
             -u|--username)
@@ -96,14 +106,18 @@ main() {
     # Check whether singularity is installed and install it if not
     bash "${SCRIPTS_PATH}"/install_singularity.sh
 
+    # Update the deployment repository
     update_repository
 
+    # Download the image if requested
+    $download_image && is_online && bash "${SCRIPTS_PATH}"/download_image.sh -u "$USERNAME"
+
+    # Bind the necessary directories
     bind_directories
 
-#    export SINGULARITYENV_PS1=$(echo -e "${PROMPT}")
-    export SINGULARITYENV_PS1='\[\033[01;32m\]\u@\h\[\033[01;33m\] [RoboTour] \[\033[01;34m\]\w\[\033[01;33m\]$(parse_git_branch) \[\033[01;34m\]\$\[\033[00m\] '
 
-
+    # Export the necessary environment variables
+    export SINGULARITYENV_PS1=$(echo -e "${PROMPT}")
     for var_name in "${CONTAINER_ENV_VARIABLES[@]}"; do
         export_environment_variable_if_present "$var_name"
     done

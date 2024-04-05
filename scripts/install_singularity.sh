@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail  # Better error handling and exiting on error
 
+print_usage() {
+    cat <<EOF
+Installs Singularity on the system. The script will install Singularity CE
+from the PPA repository.
+
+Usage:
+    bash install_singularity.sh [<options>]
+
+Options:
+    -h|--help:  Print this help message.
+EOF
+}
+
 check_singularity() {
     if [ -n "${SINGULARITY_NAME:-}" ]; then
         echo "ERROR: Cannot run install_singularity from inside Singularity."
@@ -47,6 +60,21 @@ install_singularity_via_ppa() {
 
 # Main function to execute all necessary steps
 main() {
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            -h|--help)
+            print_usage
+            ;;
+            *)
+            print_usage
+            handle_error "Unknown option: $1"
+            shift # past argument or value
+            ;;
+        esac
+    done
+
     check_singularity
     check_installed_singularity
     check_installed_via_dpkg
@@ -54,4 +82,4 @@ main() {
 }
 
 # Execute main function
-main
+main "$@"
