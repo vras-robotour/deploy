@@ -73,3 +73,4 @@ tmux
 tree
 vim
 wget
+libopenblas-dev
