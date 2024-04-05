@@ -1,0 +1,15 @@
+overpy
+gpxpy
+utm
+gpxpy
+numpy
+matplotlib
+wandb
+omegaconf
+torchmetrics
+pyyaml
+albumentations
+pillow
+tqdm
+hydra-core
+lightning

@@ -7,7 +7,7 @@ From: ros:noetic-perception-focal
     University in Prague, Czech Republic.
 
 %labels
-    Version v0.0.2
+    Version v0.0.3
 
 %setup
     [ -f "/root/.netrc" ] && cp "/root/.netrc" "${SINGULARITY_ROOTFS}/root/.netrc" || true
@@ -18,7 +18,8 @@ From: ros:noetic-perception-focal
     sudo /usr/bin/sudo
     ../commands/* /.custom_commands/
     ./install_editors.sh /.tmp/install_editors.sh
-    ./robotour.apt /.tmp/robotour.apt
+    ./packages.apt /.tmp/packages.apt
+    ./packages.pip /.tmp/packages.pip
 
 %environment
     export XDG_RUNTIME_DIR=$(mktemp -d)  # This fixes running VSCode, PyCharm etc. because /run/user/$(id -u) is not bind-mounted by default.
@@ -33,10 +34,10 @@ From: ros:noetic-perception-focal
     DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
 
     bash /.tmp/install_editors.sh
-    DEBIAN_FRONTEND=noninteractive xargs -a /.tmp/robotour.apt apt-get install -y
+    DEBIAN_FRONTEND=noninteractive xargs -a /.tmp/packages.apt apt-get install -y
 
-    pip3 install torch --index-url https://download.pytorch.org/whl/cu118
-    pip3 install overpy gpxpy utm gpxpy
+    pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+    pip3 install -r /.tmp/packages.pip
 
     chmod +x /.custom_commands/*
 

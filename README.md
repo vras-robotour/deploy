@@ -12,7 +12,8 @@ The repository contains the following directories and files:
 
 ```
 ├── build
-│   ├── robotour.apt
+│   ├── packages.apt
+│   ├── packages.pip
 │   ├── robotour.def
 │   └── ...
 ├── commands
@@ -32,7 +33,7 @@ The repository contains the following directories and files:
     └── ...
 ```
 
-- `build` - contains the Singularity definition files for building the container and the apt file with the dependencies. If you want to add new dependencies, you have to add them to the apt file.
+- `build` - contains the Singularity definition files for building the container and the apt file with the dependencies. If you want to add new dependencies, you have to add them to the `packages.apt` or `packages.pip` file.
 - `commands` - contains the scripts that are used in the container. The scripts are used to build the workspace, start the IDEs, and source the workspace.
 - `images` - contains the built or downloaded Singularity images.
 - `logs` - contains the logs from building the container.
@@ -71,3 +72,13 @@ This will build the singularity image and save it to the `images` directory. Nex
 ```bash
 bash scripts/upload_image.sh
 ```
+
+## Commands in container
+
+The container contains the following commands:
+
+- `build_workspace` - builds the workspace
+- `clion` - starts the CLion IDE
+- `pycharm` - starts the PyCharm IDE
+- `source_noetic` - sources the ROS Noetic workspace
+- `source_workspace` - sources the RoboTour workspace
