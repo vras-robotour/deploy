@@ -115,7 +115,6 @@ main() {
     # Bind the necessary directories
     bind_directories
 
-
     # Export the necessary environment variables
     export SINGULARITYENV_PS1=$(echo -e "${PROMPT}")
     for var_name in "${CONTAINER_ENV_VARIABLES[@]}"; do

@@ -24,6 +24,11 @@ init_workspace() {
 }
 
 update_packages() {
+  if ! is_online; then
+    echo "INFO: You do not seem to be online. Not updating the packages."
+    return
+  fi
+
   for package in "${!PACKAGES[@]}"; do
     if [ ! -e "${SRC_PATH}/${package}/package.xml" ]; then
       echo "INFO: Cloning the package ${package}."
