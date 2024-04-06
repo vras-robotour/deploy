@@ -3,11 +3,11 @@ gpxpy
 hydra-core
 lightning
 matplotlib
-numpy
 omegaconf
 overpy
 pillow
 pyyaml
+pyzbar
 torchmetrics
 tqdm
 utm
