@@ -1,4 +1,4 @@
-albumentations
+geopy
 gpxpy
 hydra-core
 lightning
@@ -8,7 +8,6 @@ overpy
 pillow
 pyyaml
 pyzbar
-torchmetrics
 tqdm
 utm
 wandb
