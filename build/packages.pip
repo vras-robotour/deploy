@@ -5,7 +5,7 @@ lightning
 matplotlib
 omegaconf
 overpy
-pillow
+pypng
 pyyaml
 pyzbar
 tqdm

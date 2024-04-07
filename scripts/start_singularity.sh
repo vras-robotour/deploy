@@ -116,7 +116,7 @@ main() {
     bind_directories
 
     # Export the necessary environment variables
-    export SINGULARITYENV_PS1=$(echo -e "${PROMPT}")
+    export SINGULARITYENV_PS1='\[\033[01;32m\]\u@\h\[\033[01;33m\] [RoboTour] \[\033[01;34m\]\w\[\033[01;33m\]$(parse_git_branch) \[\033[01;34m\]\$\[\033[00m\] '
     for var_name in "${CONTAINER_ENV_VARIABLES[@]}"; do
         export_environment_variable_if_present "$var_name"
     done

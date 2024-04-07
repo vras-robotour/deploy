@@ -57,7 +57,6 @@ REMOTE_IMAGES_PATH="/data/robotour2024/images"
 REMOTE_SERVER="subtdata.felk.cvut.cz"
 
 # Environment variables to be passed to the container
-PROMPT='\[\033[01;32m\]\u@\h\[\033[01;33m\] [RoboTour] \[\033[01;34m\]\w\[\033[01;33m\]$(parse_git_branch) \[\033[01;34m\]\$\[\033[00m\] '
 CONTAINER_ENV_VARIABLES=(
     ROS_MASTER_URI
     ROS_HOSTNAME
@@ -84,6 +83,7 @@ PACKAGES["test_package"]="https://github.com/vras-robotour/test_package.git"
 PACKAGES["naex"]="https://github.com/vras-robotour/naex.git"
 PACKAGES["map_data"]="https://github.com/vras-robotour/map_data.git"
 PACKAGES["robotour"]="https://github.com/vras-robotour/robotour.git"
+PACKAGES["osm2qr"]="https://github.com/vras-robotour/osm2qr.git"
 
 # ============= END: VARIABLES =============
 
