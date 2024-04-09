@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-if [ -n "$SINGULARITY_CONTAINER" ]; then
-    echo " S"
-else
-    echo ""
-fi

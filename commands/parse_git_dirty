@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-git status --porcelain 2>/dev/null | grep -q -c -v "^??" && echo "*"
