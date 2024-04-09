@@ -12,12 +12,11 @@ source "$(realpath "$(dirname "${BASH_SOURCE[0]}")")/utils.sh"
 
 init_workspace() {
   # Check if the catkin workspace is initialized
-  if [ ! -e "${SRC_PATH}/CMakeLists.txt" ]; then
+  cd "${WORKSPACE_PATH}" || exit 1
+  if [ ! -d build ] || [ ! -d devel ]; then
     echo "INFO: Initializing the catkin workspace."
-    mkdir -p "${SRC_PATH}"
-    cd "${WORKSPACE_PATH}" || exit 1
     source /opt/ros/noetic/setup.bash
-    catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3
+    catkin build -DPYTHON_EXECUTABLE=/usr/bin/python3
   else
     echo "INFO: The catkin workspace is already initialized."
   fi
@@ -54,8 +53,8 @@ start_bash() {
 main() {
   # Check if the singularity container is running
   if [ "$SINGULARITY_NAME" != "${IMAGE_FILE}" ]; then
-    echo "ERROR: You are not inside the ARO singularity container."
-    echo "       Please start the singularity first using start_singularity_aro."
+    echo "ERROR: You are not inside the singularity container."
+    echo "       Please start the singularity first using start_singularity.sh."
     exit 1
   fi
 
@@ -65,8 +64,10 @@ main() {
     mkdir -p "${WORKSPACE_PATH}"
   fi
 
-  # Initialize the workspace
-  init_workspace
+  if [ ! -d "${SRC_PATH}" ]; then
+    echo "INFO: Creating source directory in ${SRC_PATH}."
+    mkdir -p "${SRC_PATH}"
+  fi
 
   # Update the student packages
   echo
@@ -78,6 +79,9 @@ main() {
   echo
   echo "======================================================="
   echo
+
+  # Initialize the workspace
+  init_workspace
 
   # Start the interactive bash
   start_bash "$@"
