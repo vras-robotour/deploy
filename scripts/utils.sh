@@ -79,11 +79,11 @@ CONTAINER_ENV_VARIABLES=(
 
 declare -A PACKAGES
 
-PACKAGES["test_package"]="https://github.com/vras-robotour/test_package.git"
-PACKAGES["naex"]="https://github.com/vras-robotour/naex.git"
+PACKAGES["cloud_proc"]="https://github.com/ctu-vras/cloud_proc.git"
 PACKAGES["map_data"]="https://github.com/vras-robotour/map_data.git"
-PACKAGES["robotour"]="https://github.com/vras-robotour/robotour.git"
+PACKAGES["naex"]="https://github.com/vras-robotour/naex.git"
 PACKAGES["osm2qr"]="https://github.com/vras-robotour/osm2qr.git"
+PACKAGES["robotour"]="https://github.com/vras-robotour/robotour.git"
 
 # ============= END: VARIABLES =============
 

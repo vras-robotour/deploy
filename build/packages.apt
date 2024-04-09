@@ -38,6 +38,8 @@ python3-wstool
 ros-noetic-actionlib-tools
 ros-noetic-apriltag-ros
 ros-noetic-base-local-planner
+ros-noetic-cras-cpp-common
+ros-noetic-cras-msgs
 ros-noetic-ddynamic-reconfigure
 ros-noetic-ddynamic-reconfigure-python
 ros-noetic-desktop-full
