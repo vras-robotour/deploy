@@ -16,6 +16,8 @@ init_workspace() {
   if [ ! -d build ] || [ ! -d devel ]; then
     echo "INFO: Initializing the catkin workspace."
     source /opt/ros/noetic/setup.bash
+    rosdep update
+    rosdep install --from-paths src --ignore-src -r -y
     catkin build -DPYTHON_EXECUTABLE=/usr/bin/python3
   else
     echo "INFO: The catkin workspace is already initialized."

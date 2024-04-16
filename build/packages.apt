@@ -12,6 +12,7 @@ htop
 libgoogle-glog-dev
 liblua5.3-dev
 libopenblas-dev
+libudev-dev
 libuvc-dev
 libzbar0
 mc
