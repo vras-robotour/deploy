@@ -2,7 +2,9 @@
 
 local_arch() {
     local arch="amd64"
-    if [[ "$(uname -m)" = *"aarch"* ]] || [[ "$(uname -m)" = *"arm"* ]]; then
+    if [ -d "/usr/lib/aarch64-linux-gnu/tegra" ]; then
+        arch="jetson"
+    elif [[ "$(uname -m)" = *"aarch"* ]] || [[ "$(uname -m)" = *"arm"* ]]; then
         arch="arm64"
     fi
     echo "$arch"
@@ -44,12 +46,17 @@ SRC_PATH="${WORKSPACE_PATH}/src"
 
 # Important files
 BASE_NAME="robotour"
-ARCH=$(local_arch)
+ARCH=$(local_arch) # amd64, jetson, arm64
 
 IMAGE_FILE="${BASE_NAME}_${ARCH}.simg"
-DEFINITION_FILE="${BUILD_PATH}/${ARCH}.def"
 LOG_FILE="${LOGS_PATH}/${BASE_NAME}.log"
 SETUP_FILE="${WORKSPACE_PATH}/devel/setup.bash"
+
+if [ "$ARCH" = "jetson" ]; then
+    DEFINITION_FILE="${BUILD_PATH}/jetson.def"
+else
+    DEFINITION_FILE="${BUILD_PATH}/desktop.def"
+fi
 
 # Remote server
 USERNAME="${USERNAME:-$(whoami)}"

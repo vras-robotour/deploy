@@ -51,12 +51,12 @@ main() {
   fi
 
   # Build the image.
-  if [ "${ARCH}" = "amd64" ]; then
-      sudo singularity build --nv "${IMAGES_PATH}/${IMAGE_FILE}" "${DEFINITION_FILE}" 2>&1 | tee "${LOG_FILE}"
-  else
+  if [ "${ARCH}" = "jetson" ]; then
       export SINGULARITY_TMPDIR=/home/robot/robotour2024/tmp
       export SINGULARITY_CACHEDIR=/home/robot/robotour2024/cache
       sudo -E singularity build --nv "${IMAGES_PATH}/${IMAGE_FILE}" "${DEFINITION_FILE}" 2>&1 | tee "${LOG_FILE}"
+  else
+      sudo singularity build --nv "${IMAGES_PATH}/${IMAGE_FILE}" "${DEFINITION_FILE}" 2>&1 | tee "${LOG_FILE}"
   fi
 
   # Change the owner of the image to the current user.
