@@ -47,7 +47,7 @@ set_nvidia_gpu() {
         echo "INFO: Not setting up NVidia GPU support."
     fi
 }
-
+# TODO: Copy paths from the Jetson
 bind_directories() {
     bind="${ROBOTOUR_PATH}:${ROBOTOUR_PATH}"
     if [ -d /snap ]; then

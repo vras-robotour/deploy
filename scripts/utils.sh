@@ -47,14 +47,14 @@ BASE_NAME="robotour"
 ARCH=$(local_arch)
 
 IMAGE_FILE="${BASE_NAME}_${ARCH}.simg"
-DEFINITION_FILE="${BUILD_PATH}/${BASE_NAME}.def"
+DEFINITION_FILE="${BUILD_PATH}/${ARCH}.def"
 LOG_FILE="${LOGS_PATH}/${BASE_NAME}.log"
 SETUP_FILE="${WORKSPACE_PATH}/devel/setup.bash"
 
 # Remote server
 USERNAME="${USERNAME:-$(whoami)}"
-REMOTE_IMAGES_PATH="/data/robotour2024/images"
-REMOTE_SERVER="subtdata.felk.cvut.cz"
+REMOTE_IMAGES_PATH="/mnt/data/vras/data/robotour2024/images"
+REMOTE_SERVER="login3.rci.cvut.cz"
 
 # Environment variables to be passed to the container
 CONTAINER_ENV_VARIABLES=(
@@ -196,6 +196,18 @@ upload_image() {
 
 download_image() {
   scp "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}" "${IMAGES_PATH}/${IMAGE_FILE}"
+}
+
+info_log() {
+    echo -e "\e[34m[INFO]\e[0m $1"
+}
+
+warning_log() {
+    echo -e "\e[33m[WARNING]\e[0m $1"
+}
+
+error_log() {
+    echo -e "\e[31m[ERROR]\e[0m $1"
 }
 
 # ============= END: UTILITY FUNCTIONS =============

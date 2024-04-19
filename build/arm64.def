@@ -7,12 +7,13 @@ From: ros:noetic-perception-focal
     University in Prague, Czech Republic.
 
 %labels
-    Version v0.0.3
+    Version v0.1.2
 
 %setup
     [ -f "/root/.netrc" ] && cp "/root/.netrc" "${SINGULARITY_ROOTFS}/root/.netrc" || true
     mkdir -p $SINGULARITY_ROOTFS/.custom_commands
     mkdir -p $SINGULARITY_ROOTFS/.tmp
+    mkdir -p $SINGULARITY_ROOTFS/usr/lib/aarch64-linux-gnu/tegra
 
 %files
     sudo /usr/bin/sudo
@@ -28,15 +29,14 @@ From: ros:noetic-perception-focal
 %post
     apt-get update -y
     DEBIAN_FRONTEND=noninteractive apt-get install -y wget lsb-release git
-    echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list
-    wget https://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
-    apt-get update -y
-    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
 
     bash /.tmp/install_editors.sh
     DEBIAN_FRONTEND=noninteractive xargs -a /.tmp/packages.apt apt-get install -y
 
-    pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+    wget -q -O /.tmp/torch-1.11.0a0+gitunknown-cp38-cp38-linux_aarch64.whl \
+        https://github.com/ctu-vras/pytorch/releases/download/v1.11.0/torch-1.11.0a0+gitunknown-cp38-cp38-linux_aarch64.whl
+    pip install /.tmp/torch-1.11.0a0+gitunknown-cp38-cp38-linux_aarch64.whl
+
     pip3 install -r /.tmp/packages.pip
 
     chmod +x /.custom_commands/*
@@ -44,4 +44,3 @@ From: ros:noetic-perception-focal
     apt-get clean
     rm /root/.netrc || true
     rm -rf /.tmp || true
-    

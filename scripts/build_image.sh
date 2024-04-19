@@ -51,11 +51,18 @@ main() {
   fi
 
   # Build the image.
-  sudo singularity build --nv "${IMAGES_PATH}/${IMAGE_FILE}" "${DEFINITION_FILE}" 2>&1 | tee "${LOG_FILE}"
+  if [ "${ARCH}" = "amd64" ]; then
+      sudo singularity build --nv "${IMAGES_PATH}/${IMAGE_FILE}" "${DEFINITION_FILE}" 2>&1 | tee "${LOG_FILE}"
+  else
+      export SINGULARITY_TMPDIR=/home/robot/robotour2024/tmp
+      export SINGULARITY_CACHEDIR=/home/robot/robotour2024/cache
+      sudo -E singularity build --nv "${IMAGES_PATH}/${IMAGE_FILE}" "${DEFINITION_FILE}" 2>&1 | tee "${LOG_FILE}"
+  fi
 
   # Change the owner of the image to the current user.
   if [ -e "${IMAGES_PATH}/${IMAGE_FILE}" ]; then
       sudo chown "$(id -un)":"$(id -gn)" "${IMAGES_PATH}/${IMAGE_FILE}" || true
+      sudo chmod a+w "${IMAGES_PATH}/${IMAGE_FILE}" || true
   fi
 }
 

@@ -1,0 +1,42 @@
+Bootstrap: docker
+From: ros:noetic-perception-focal
+
+%help
+    Custom Singularity container for RoboTour 2024. This container
+    is developed by the Department of Cybernetics, Czech Technical
+    University in Prague, Czech Republic.
+
+%labels
+    Version v0.1.2
+
+%setup
+    [ -f "/root/.netrc" ] && cp "/root/.netrc" "${SINGULARITY_ROOTFS}/root/.netrc" || true
+    mkdir -p $SINGULARITY_ROOTFS/.custom_commands
+    mkdir -p $SINGULARITY_ROOTFS/.tmp
+
+%files
+    sudo /usr/bin/sudo
+    ../commands/* /.custom_commands/
+    ./install_editors.sh /.tmp/install_editors.sh
+    ./packages.apt /.tmp/packages.apt
+    ./packages.pip /.tmp/packages.pip
+
+%environment
+    export XDG_RUNTIME_DIR=$(mktemp -d)  # This fixes running VSCode, PyCharm etc. because /run/user/$(id -u) is not bind-mounted by default.
+    export PATH="/.custom_commands:${PATH}"
+
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive xargs -a /.tmp/packages.apt apt-get install -y
+
+    bash /.tmp/install_editors.sh
+
+    pip3 install torch==1.11.0+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
+    pip3 install -r /.tmp/packages.pip
+
+    chmod +x /.custom_commands/*
+
+    apt-get clean
+    rm /root/.netrc || true
+    rm -rf /.tmp || true
+    
