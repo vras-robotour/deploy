@@ -47,14 +47,29 @@ set_nvidia_gpu() {
         info_log "Not setting up NVidia GPU support."
     fi
 }
-# TODO: Copy paths from the Jetson
+
 bind_directories() {
     bind="${ROBOTOUR_PATH}:${ROBOTOUR_PATH}"
-    if [ -d /snap ]; then
-#      info_log "Mounting /snap directory."
-      bind="${bind},/snap:/snap"
+
+    if [ "${ARCH}" = "jetson" ]; then
+          bind="${bind},/usr/local/cuda-10.2"
+          bind="${bind},$(find /usr/lib/aarch64-linux-gnu/ -name 'libcudnn*' | tr '\n' ',')"
+          bind="${bind},$(find /usr/include/ -name *cudnn* | tr '\n' ',')"
+          bind="${bind},$(find /usr/lib/aarch64-linux-gnu/ -name libcublas*.so* | tr '\n' ',')"
+          bind="${bind},$(find /usr/lib/aarch64-linux-gnu/ -name libnv*.so* | tr '\n' ',')"
+          bind="${bind},$(find /usr/include/ -name *cublas* | tr '\n' ',')"
+          # bind="${bind}/usr/lib/aarch64-linux-gnu/tegra"
+    elif [ "${ARCH}" = "amd64" ]; then
+          if [ -d /usr/local/cuda ]; then
+              bind="${bind},/snap:/snap"
+          fi
+    elif [ "${ARCH}" = "arm64" ]; then
+          if [ -d /usr/local/cuda ]; then
+              bind="${bind},/snap:/snap"
+          fi
     else
-      info_log "No /snap directory found. Skipping mounting."
+          error_log "Unknown architecture: ${ARCH}"
+          exit 1
     fi
 }
 
