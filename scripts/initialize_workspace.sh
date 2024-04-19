@@ -32,7 +32,7 @@ update_packages() {
 
   for package in "${!PACKAGES[@]}"; do
     if [ ! -e "${SRC_PATH}/${package}/package.xml" ]; then
-      info_log "Cloning the package ${package}."
+      info_log "Cloning the package \e[1;95m${package}\e[0m."
       git clone "${PACKAGES[$package]}" "${SRC_PATH}/${package}"
     else
       info_log "Updating the package \e[1;95m${package}\e[0m to the latest version."
