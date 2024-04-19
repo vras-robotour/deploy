@@ -45,21 +45,23 @@ main() {
       esac
   done
 
+  check_ssh_key_or_prompt_password
+
   local_exists=$(local_image_exists)
   remote_exists=$(remote_image_exists)
 
   if [ "$local_exists" == "true" ]; then
-    echo "INFO: Found local image ${IMAGE_FILE}."
+    info_log "Found local image \e[1;95m${IMAGE_FILE}\e[0m."
   else
-    echo "ERROR: The local image ${IMAGE_FILE} does not exist."
+    error_log "The local image \e[1;95m${IMAGE_FILE}\e[0m does not exist."
     exit 1
   fi
 
   if [ "$remote_exists" == "true" ]; then
-    echo "INFO: Found remote image ${IMAGE_FILE}."
+    info_log "Found remote image \e[1;95m${IMAGE_FILE}\e[0m."
     compare_versions_for_upload
   else
-    echo "INFO: The remote image ${IMAGE_FILE} does not exist. Uploading a new one."
+    info_log "The remote image \e[1;95m${IMAGE_FILE}\e[0m does not exist. Uploading a new one."
   fi
 
   upload_image

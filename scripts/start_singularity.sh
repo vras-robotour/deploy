@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -eo pipefail  # Better error handling and exiting on error
 
-source "$(realpath "$(dirname "${BASH_SOURCE[0]}")")/utils.sh"
-
 print_usage() {
     cat <<EOF
 Start RoboTour Singularity container. This script will do the following:
@@ -27,12 +25,14 @@ Options:
 EOF
 }
 
+source "$(realpath "$(dirname "${BASH_SOURCE[0]}")")/utils.sh"
+
 update_repository() {
     if is_online; then
-        echo "INFO: Updating repository to the latest version."
+        info_log "Updating repository to the latest version."
         (cd "$PROJECT_PATH" && git pull)
     else
-        echo "INFO: You do not seem to be online. Not updating the repository."
+        info_log "You do not seem to be online. Not updating the repository."
     fi
 }
 
@@ -41,20 +41,20 @@ update_repository() {
 set_nvidia_gpu() {
     nv=""
     if [ "$ARO_SINGULARITY_NV" = "1" ]; then
-        echo "INFO: Setting up NVidia GPU support."
+        info_log "Setting up NVidia GPU support."
         nv="--nv"
     else
-        echo "INFO: Not setting up NVidia GPU support."
+        info_log "Not setting up NVidia GPU support."
     fi
 }
 # TODO: Copy paths from the Jetson
 bind_directories() {
     bind="${ROBOTOUR_PATH}:${ROBOTOUR_PATH}"
     if [ -d /snap ]; then
-      echo "INFO: Mounting /snap directory."
+#      info_log "Mounting /snap directory."
       bind="${bind},/snap:/snap"
     else
-      echo "INFO: No /snap directory found. Skipping mounting."
+      info_log "No /snap directory found. Skipping mounting."
     fi
 }
 
@@ -101,7 +101,13 @@ main() {
     echo
 
     # If in singularity container exit
-    in_singularity && echo "ERROR: You are already inside a singularity container." && exit 1
+    in_singularity && error_log "You are already inside a singularity container." && exit 1
+
+    # Warn if the user is not using nvidia_gpu
+    if [ "$nvidia_gpu" = "" ]; then
+        warn_log "You are not using NVIDIA GPU support. If you have \n\
+        \ran NVIDIA GPU, you can enable it by using the --nv option."
+    fi
 
     # Check whether singularity is installed and install it if not
     bash "${SCRIPTS_PATH}"/install_singularity.sh
@@ -121,7 +127,7 @@ main() {
         export_environment_variable_if_present "$var_name"
     done
 
-    echo "INFO: Starting Singularity container from image ${IMAGE_FILE}."
+    info_log "Starting Singularity container from image \e[1;95m${IMAGE_FILE}\e[0m."
     singularity exec $nvidia_gpu -e -B "${bind}" "${IMAGES_PATH}/${IMAGE_FILE}" "${SCRIPTS_PATH}/initialize_workspace.sh" "$@"
 }
 

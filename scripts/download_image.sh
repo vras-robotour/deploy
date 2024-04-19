@@ -48,22 +48,20 @@ main() {
 
   local_exists=$(local_image_exists)
   remote_exists=$(remote_image_exists)
-  echo "${remote_exists}"
 
   if [ "$local_exists" == "true" ]; then
-    echo "INFO: Found the local image ${IMAGE_FILE}."
+    info_log "Found the local image ${IMAGE_FILE}."
   else
-    echo "INFO: The local image does not exist."
+    info_log "The local image does not exist."
   fi
 
   if [ "$remote_exists" == "true" ]; then
-    echo "INFO: Found the remote image ${IMAGE_FILE}."
+    info_log "Found the remote image ${IMAGE_FILE}."
     compare_versions_for_download
   else
-    echo "ERROR: The remote image does not exist."
+    error_log "The remote image does not exist."
     exit 1
   fi
-
 
   download_image
 }

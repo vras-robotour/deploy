@@ -14,28 +14,28 @@ init_workspace() {
   # Check if the catkin workspace is initialized
   cd "${WORKSPACE_PATH}" || exit 1
   if [ ! -d build ] || [ ! -d devel ]; then
-    echo "INFO: Initializing the catkin workspace."
+    info_log "Initializing the catkin workspace."
     source /opt/ros/noetic/setup.bash
     rosdep update
     rosdep install --from-paths src --ignore-src -r -y
     catkin build -DPYTHON_EXECUTABLE=/usr/bin/python3
   else
-    echo "INFO: The catkin workspace is already initialized."
+    info_log "The catkin workspace is already initialized."
   fi
 }
 
 update_packages() {
   if ! is_online; then
-    echo "INFO: You do not seem to be online. Not updating the packages."
+    info_log "You do not seem to be online. Not updating the packages."
     return
   fi
 
   for package in "${!PACKAGES[@]}"; do
     if [ ! -e "${SRC_PATH}/${package}/package.xml" ]; then
-      echo "INFO: Cloning the package ${package}."
+      info_log "Cloning the package ${package}."
       git clone "${PACKAGES[$package]}" "${SRC_PATH}/${package}"
     else
-      echo "INFO: Updating the package ${package} to the latest version."
+      info_log "Updating the package \e[1;95m${package}\e[0m to the latest version."
       (cd "${SRC_PATH}/${package}" && git pull)
     fi
   done
@@ -43,7 +43,7 @@ update_packages() {
 
 start_bash() {
   cd "${WORKSPACE_PATH}" || exit 1
-  echo "INFO: Starting interactive bash while sourcing the workspace."
+  info_log "Starting interactive bash while sourcing the workspace."
   echo
   if [ $# -gt 0 ]; then
     exec bash -c "source \"${WORKSPACE_PATH}/devel/setup.bash\"; $*"
@@ -55,19 +55,19 @@ start_bash() {
 main() {
   # Check if the singularity container is running
   if [ "$SINGULARITY_NAME" != "${IMAGE_FILE}" ]; then
-    echo "ERROR: You are not inside the singularity container."
+    error_log "You are not inside the singularity container."
     echo "       Please start the singularity first using start_singularity.sh."
     exit 1
   fi
 
   # Check if the workspace exists
   if [ ! -d "${WORKSPACE_PATH}" ]; then
-    echo "INFO: Creating workspace in ${WORKSPACE_PATH}."
+    info_log "Creating workspace in ${WORKSPACE_PATH}."
     mkdir -p "${WORKSPACE_PATH}"
   fi
 
   if [ ! -d "${SRC_PATH}" ]; then
-    echo "INFO: Creating source directory in ${SRC_PATH}."
+    info_log "Creating source directory in ${SRC_PATH}."
     mkdir -p "${SRC_PATH}"
   fi
 
