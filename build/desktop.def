@@ -23,7 +23,7 @@ From: ros:noetic-perception-focal
 
 %environment
     export XDG_RUNTIME_DIR=$(mktemp -d)  # This fixes running VSCode, PyCharm etc. because /run/user/$(id -u) is not bind-mounted by default.
-    export PATH="/.custom_commands:${PATH}"
+    export PATH="/.custom_commands:/usr/lib/x86_64-linux-gnu:/usr/lib/aarch64-linux-gnu:${PATH}"
 
 %post
     apt-get update -y

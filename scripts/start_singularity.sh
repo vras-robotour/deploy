@@ -54,17 +54,17 @@ bind_directories() {
     if [ "${ARCH}" = "jetson" ]; then
           bind="${bind},/usr/local/cuda-10.2"
           bind="${bind},$(find /usr/lib/aarch64-linux-gnu/ -name 'libcudnn*' | tr '\n' ',')"
-          bind="${bind},$(find /usr/include/ -name *cudnn* | tr '\n' ',')"
-          bind="${bind},$(find /usr/lib/aarch64-linux-gnu/ -name libcublas*.so* | tr '\n' ',')"
-          bind="${bind},$(find /usr/lib/aarch64-linux-gnu/ -name libnv*.so* | tr '\n' ',')"
-          bind="${bind},$(find /usr/include/ -name *cublas* | tr '\n' ',')"
+          bind="${bind},$(find /usr/include/ -name '*cudnn*' | tr '\n' ',')"
+          bind="${bind},$(find /usr/lib/aarch64-linux-gnu/ -name 'libcublas*.so*' | tr '\n' ',')"
+          bind="${bind},$(find /usr/lib/aarch64-linux-gnu/ -name 'libnv*.so*' | tr '\n' ',')"
+          bind="${bind},$(find /usr/include/ -name '*cublas*' | tr '\n' ',')"
           # bind="${bind}/usr/lib/aarch64-linux-gnu/tegra"
     elif [ "${ARCH}" = "amd64" ]; then
-          if [ -d /usr/local/cuda ]; then
+          if [ -d /snap ]; then
               bind="${bind},/snap:/snap"
           fi
     elif [ "${ARCH}" = "arm64" ]; then
-          if [ -d /usr/local/cuda ]; then
+          if [ -d /snap ]; then
               bind="${bind},/snap:/snap"
           fi
     else

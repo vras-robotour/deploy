@@ -1,20 +1,20 @@
 # ============= START: LOGGING =============
 
 info_log() {
-    echo -e "\e[34m[INFO]\e[0m $1"
+	echo -e "\e[34m[INFO]\e[0m $1"
 }
 
 warn_log() {
-    echo -e "\e[33m[WARNING]\e[0m $1"
+	echo -e "\e[33m[WARNING]\e[0m $1"
 }
 
 error_log() {
-    echo -e "\e[31m[ERROR]\e[0m $1"
+	echo -e "\e[31m[ERROR]\e[0m $1"
 }
 
 read_input() {
-    echo -en "\e[32m[INPUT]\e[0m $1"
-    read -r REPLY
+	echo -en "\e[32m[INPUT]\e[0m $1"
+	read -r REPLY
 }
 
 # ============= START: END =============
@@ -22,62 +22,61 @@ read_input() {
 # ============= START: HELPER FUNCTIONS FOR VARIABLES =============
 
 local_arch() {
-    local arch="amd64"
-    if [ -d "/usr/lib/aarch64-linux-gnu/tegra" ]; then
-        arch="jetson"
-    elif [[ "$(uname -m)" = *"aarch"* ]] || [[ "$(uname -m)" = *"arm"* ]]; then
-        arch="arm64"
-    fi
-    echo "$arch"
+	local arch="amd64"
+	if [ -d "/usr/lib/aarch64-linux-gnu/tegra" ]; then
+		arch="jetson"
+	elif [[ "$(uname -m)" = *"aarch"* ]] || [[ "$(uname -m)" = *"arm"* ]]; then
+		arch="arm64"
+	fi
+	echo "$arch"
 }
 
 get_project_path() {
-  script_path="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
+	script_path="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 
-  while [[ "$script_path" != "/" ]]; do
-    if [[ -d "$script_path/deploy" ]]; then
-      echo "$script_path/deploy"
-      return 0
-    fi
-    script_path="$(dirname "$script_path")"
-  done
+	while [[ "$script_path" != "/" ]]; do
+		if [[ -d "$script_path/deploy" ]]; then
+			echo "$script_path/deploy"
+			return 0
+		fi
+		script_path="$(dirname "$script_path")"
+	done
 
-  error_log "RoboTour deploy directory not found."
-  return 1
+	error_log "RoboTour deploy directory not found."
+	return 1
 }
 
-
 check_ssh_key_or_prompt_password() {
-    local max_attempts=3
-    local attempt=0
+	local max_attempts=3
+	local attempt=0
 
-    # Check if SSH key exists for the server
-    if ssh -o BatchMode=yes ${USERNAME}@${REMOTE_SERVER} true 2>/dev/null; then
-        # If SSH key exists and connection is successful, set ssh_key_exists flag
-        info_log "Connection to \e[1;95m${REMOTE_SERVER}\e[0m successful."
-        return 0
-    fi
+	# Check if SSH key exists for the server
+	if ssh -o BatchMode=yes ${USERNAME}@${REMOTE_SERVER} true 2>/dev/null; then
+		# If SSH key exists and connection is successful, set ssh_key_exists flag
+		info_log "Connection to \e[1;95m${REMOTE_SERVER}\e[0m successful."
+		return 0
+	fi
 
-    while [ $attempt -lt $max_attempts ]; do
-        attempt=$((attempt + 1))
-        if [ $attempt -eq 1 ]; then
-            warn_log "No SSH key found for \e[1;95m${REMOTE_SERVER}\e[0m. Please enter the password."
-        else
-            warn_log "Incorrect password. Please try again. (Attempt $attempt/$max_attempts)"
-        fi
+	while [ $attempt -lt $max_attempts ]; do
+		attempt=$((attempt + 1))
+		if [ $attempt -eq 1 ]; then
+			warn_log "No SSH key found for \e[1;95m${REMOTE_SERVER}\e[0m. Please enter the password."
+		else
+			warn_log "Incorrect password. Please try again. (Attempt $attempt/$max_attempts)"
+		fi
 
-        read -rsp "Password: " SSH_PASSWORD
-        echo
+		read -rsp "Password: " SSH_PASSWORD
+		echo
 
-        # Attempt to connect using the provided password
-        if sshpass -p "${SSH_PASSWORD}" ssh ${USERNAME}@${REMOTE_SERVER} true 2>/dev/null; then
-            export SSH_PASSWORD
-            return 0
-        fi
-    done
+		# Attempt to connect using the provided password
+		if sshpass -p "${SSH_PASSWORD}" ssh ${USERNAME}@${REMOTE_SERVER} true 2>/dev/null; then
+			export SSH_PASSWORD
+			return 0
+		fi
+	done
 
-    error_log "Maximum number of attempts exceeded. Exiting."
-    return 1
+	error_log "Maximum number of attempts exceeded. Exiting."
+	return 1
 }
 
 # ============= END: HELPER FUNCTIONS FOR VARIABLES =============
@@ -108,9 +107,9 @@ LOG_FILE="${LOGS_PATH}/${BASE_NAME}.log"
 SETUP_FILE="${WORKSPACE_PATH}/devel/setup.bash"
 
 if [ "$ARCH" = "jetson" ]; then
-    DEFINITION_FILE="${BUILD_PATH}/jetson.def"
+	DEFINITION_FILE="${BUILD_PATH}/jetson.def"
 else
-    DEFINITION_FILE="${BUILD_PATH}/desktop.def"
+	DEFINITION_FILE="${BUILD_PATH}/desktop.def"
 fi
 
 # Remote server
@@ -122,21 +121,21 @@ REMOTE_SERVER="login3.rci.cvut.cz"
 
 # Environment variables to be passed to the container
 CONTAINER_ENV_VARIABLES=(
-    ROS_MASTER_URI
-    ROS_HOSTNAME
-    ROS_IP
-    ROS_HOME
-    ROS_LOG_DIR
-    ROSCONSOLE_CONFIG_FILE
-    ROS_PYTHON_LOG_CONFIG_FILE
-    HOSTNAME
-    DISPLAY
-    USER
-    XAUTHORITY
-    LANG
-    DBUS_SESSION_BUS_ADDRESS
-    SETUP_FILE
-    WORKSPACE_PATH
+	ROS_MASTER_URI
+	ROS_HOSTNAME
+	ROS_IP
+	ROS_HOME
+	ROS_LOG_DIR
+	ROSCONSOLE_CONFIG_FILE
+	ROS_PYTHON_LOG_CONFIG_FILE
+	HOSTNAME
+	DISPLAY
+	USER
+	XAUTHORITY
+	LANG
+	DBUS_SESSION_BUS_ADDRESS
+	SETUP_FILE
+	WORKSPACE_PATH
 )
 
 # Packages
@@ -155,8 +154,8 @@ PACKAGES["image_segmentation"]="https://github.com/vras-robotour/image_segmentat
 # ============= START: UTILITY FUNCTIONS =============
 
 handle_error() {
-    error_log "$1"
-    exit 1
+	error_log "$1"
+	exit 1
 }
 
 is_online() {
@@ -169,7 +168,7 @@ is_online() {
 	elif which ping; then
 		timeout 1 ping -c1 "$domain" 2>/dev/null 1>/dev/null
 		[ "$?" = "0" ] && return 1
-		[ "$?" = "126" ] && return 1  # Operation not permitted; this happens inside Singularity. In that case, succeed.
+		[ "$?" = "126" ] && return 1 # Operation not permitted; this happens inside Singularity. In that case, succeed.
 		return 0
 	else
 		return 0
@@ -177,108 +176,108 @@ is_online() {
 }
 
 in_singularity() {
-  [ -n "$SINGULARITY_CONTAINER" ]
+	[ -n "$SINGULARITY_CONTAINER" ]
 }
 
 get_remote_image_version() {
-    if [ -n "$SSH_PASSWORD" ]; then
-        remote_version=$(sshpass -p "${SSH_PASSWORD}" ssh -t ${USERNAME}@${REMOTE_SERVER} \
-            "cd ${REMOTE_IMAGES_PATH}; \
-            singularity inspect ${IMAGE_FILE}" 2>/dev/null | \
-            grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
-    else
-        remote_version=$(ssh -t ${USERNAME}@${REMOTE_SERVER} \
-            "cd ${REMOTE_IMAGES_PATH}; \
-            singularity inspect ${IMAGE_FILE}" 2>/dev/null | \
-            grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
-    fi
-    echo "${remote_version}"
+	if [ -n "$SSH_PASSWORD" ]; then
+		remote_version=$(sshpass -p "${SSH_PASSWORD}" ssh -t ${USERNAME}@${REMOTE_SERVER} \
+			"cd ${REMOTE_IMAGES_PATH}; \
+            singularity inspect ${IMAGE_FILE}" 2>/dev/null |
+			grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
+	else
+		remote_version=$(ssh -t ${USERNAME}@${REMOTE_SERVER} \
+			"cd ${REMOTE_IMAGES_PATH}; \
+            singularity inspect ${IMAGE_FILE}" 2>/dev/null |
+			grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
+	fi
+	echo "${remote_version}"
 }
 
 get_local_image_version() {
-    local_version=$(singularity inspect "${IMAGES_PATH}/${IMAGE_FILE}" 2>/dev/null | \
-        grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
-    echo "${local_version}"
+	local_version=$(singularity inspect "${IMAGES_PATH}/${IMAGE_FILE}" 2>/dev/null |
+		grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
+	echo "${local_version}"
 }
 
 compare_versions_for_upload() {
-    local_version=$(get_local_image_version)
-    remote_version=$(get_remote_image_version)
+	local_version=$(get_local_image_version)
+	remote_version=$(get_remote_image_version)
 
-    echo
-    if [[ "$local_version" == "$remote_version" ]]; then
-        # Versions are equal
-        read_input "The remote image is already up to date (${local_version}). Do you want to continue? [y/N] "
-    elif [[ "$(echo -e "$local_version\n$remote_version" | sort -V | tail -n1)" == "$local_version" ]]; then
-        # Local version is strictly newer
-        read_input "The local image is newer (${local_version}) than the remote one (${remote_version}). Do you want to continue? [y/N] "
-    else
-        # Remote version is strictly newer
-        read_input "The remote image (${remote_version}) is newer than the local one (${local_version}). Do you want to continue? [y/N] "
-    fi
+	echo
+	if [[ "$local_version" == "$remote_version" ]]; then
+		# Versions are equal
+		read_input "The remote image is already up to date (${local_version}). Do you want to continue? [y/N] "
+	elif [[ "$(echo -e "$local_version\n$remote_version" | sort -V | tail -n1)" == "$local_version" ]]; then
+		# Local version is strictly newer
+		read_input "The local image is newer (${local_version}) than the remote one (${remote_version}). Do you want to continue? [y/N] "
+	else
+		# Remote version is strictly newer
+		read_input "The remote image (${remote_version}) is newer than the local one (${local_version}). Do you want to continue? [y/N] "
+	fi
 
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo
-        info_log "Aborting the upload."
-        exit 0
-    fi
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		echo
+		info_log "Aborting the upload."
+		exit 0
+	fi
 }
 
 compare_versions_for_download() {
-  local_version=$(get_local_image_version)
-  remote_version=$(get_remote_image_version)
+	local_version=$(get_local_image_version)
+	remote_version=$(get_remote_image_version)
 
-  if [[ "$local_version" == "$remote_version" ]]; then
-      # Versions are equal
-      read_input "The local image is already up to date (${local_version}). Do you want to continue? [y/N] "
-  elif [[ "$(echo -e "$local_version\n$remote_version" | sort -V | tail -n1)" == "$local_version" ]]; then
-      # Local version is strictly newer
-      read_input "The local image is newer (${local_version}) than the remote one (${remote_version}). Do you want to continue? [y/N] "
-  else
-      # Remote version is strictly newer
-      read_input "The remote image (${remote_version}) is newer than the local one (${local_version}). Do you want to continue? [y/N] "
-  fi
+	if [[ "$local_version" == "$remote_version" ]]; then
+		# Versions are equal
+		read_input "The local image is already up to date (${local_version}). Do you want to continue? [y/N] "
+	elif [[ "$(echo -e "$local_version\n$remote_version" | sort -V | tail -n1)" == "$local_version" ]]; then
+		# Local version is strictly newer
+		read_input "The local image is newer (${local_version}) than the remote one (${remote_version}). Do you want to continue? [y/N] "
+	else
+		# Remote version is strictly newer
+		read_input "The remote image (${remote_version}) is newer than the local one (${local_version}). Do you want to continue? [y/N] "
+	fi
 
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      echo
-      info_log "Aborting the download."
-      exit 0
-  fi
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		echo
+		info_log "Aborting the download."
+		exit 0
+	fi
 }
 
 remote_image_exists() {
-    if [ -n "$SSH_PASSWORD" ]; then
-        exists=$(sshpass -p "${SSH_PASSWORD}" ssh -t ${USERNAME}@${REMOTE_SERVER} \
-            "test -f ${REMOTE_IMAGES_PATH}/${IMAGE_FILE} && echo true || echo false" 2>/dev/null)
-    else
-        exists=$(ssh -t ${USERNAME}@${REMOTE_SERVER} \
-            "test -f ${REMOTE_IMAGES_PATH}/${IMAGE_FILE} && echo true || echo false" 2>/dev/null)
-    fi
-    echo "${exists}" | grep -q "true" && echo "true" || echo "false"
+	if [ -n "$SSH_PASSWORD" ]; then
+		exists=$(sshpass -p "${SSH_PASSWORD}" ssh -t ${USERNAME}@${REMOTE_SERVER} \
+			"test -f ${REMOTE_IMAGES_PATH}/${IMAGE_FILE} && echo true || echo false" 2>/dev/null)
+	else
+		exists=$(ssh -t ${USERNAME}@${REMOTE_SERVER} \
+			"test -f ${REMOTE_IMAGES_PATH}/${IMAGE_FILE} && echo true || echo false" 2>/dev/null)
+	fi
+	echo "${exists}" | grep -q "true" && echo "true" || echo "false"
 }
 
 local_image_exists() {
-  if [ -f "${IMAGES_PATH}/${IMAGE_FILE}" ]; then
-    echo "true"
-  else
-    echo "false"
-  fi
+	if [ -f "${IMAGES_PATH}/${IMAGE_FILE}" ]; then
+		echo "true"
+	else
+		echo "false"
+	fi
 }
 
 upload_image() {
-    if [ -n "$SSH_PASSWORD" ]; then
-        rsync -P --rsh="sshpass -p ${SSH_PASSWORD} ssh -l ${USERNAME}" "${IMAGES_PATH}/${IMAGE_FILE}" "${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}"
-    else
-        rsync -P "${IMAGES_PATH}/${IMAGE_FILE}" "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}"
-    fi
+	if [ -n "$SSH_PASSWORD" ]; then
+		rsync -P --rsh="sshpass -p ${SSH_PASSWORD} ssh -l ${USERNAME}" "${IMAGES_PATH}/${IMAGE_FILE}" "${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}"
+	else
+		rsync -P "${IMAGES_PATH}/${IMAGE_FILE}" "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}"
+	fi
 }
 
 download_image() {
-    if [ -n "$SSH_PASSWORD" ]; then
-        rsync -P --rsh="sshpass -p ${SSH_PASSWORD} ssh -l ${USERNAME}" "${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}" "${IMAGES_PATH}/${IMAGE_FILE}"
-    else
-        rsync -P "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}" "${IMAGES_PATH}/${IMAGE_FILE}"
-    fi
+	if [ -n "$SSH_PASSWORD" ]; then
+		rsync -P --rsh="sshpass -p ${SSH_PASSWORD} ssh -l ${USERNAME}" "${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}" "${IMAGES_PATH}/${IMAGE_FILE}"
+	else
+		rsync -P "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}" "${IMAGES_PATH}/${IMAGE_FILE}"
+	fi
 }
 
 # ============= END: UTILITY FUNCTIONS =============
