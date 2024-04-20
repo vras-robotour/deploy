@@ -118,6 +118,7 @@ REMOTE_IMAGES_PATH="/mnt/data/vras/data/robotour2024/images"
 #REMOTE_IMAGES_PATH="/data/robotour2024/images"
 REMOTE_SERVER="login3.rci.cvut.cz"
 #REMOTE_SERVER="subtdata.felk.cvut.cz"
+SSH_PASSWORD=""
 
 # Environment variables to be passed to the container
 CONTAINER_ENV_VARIABLES=(
