@@ -149,6 +149,7 @@ PACKAGES["naex"]="https://github.com/vras-robotour/naex.git"
 PACKAGES["osm2qr"]="https://github.com/vras-robotour/osm2qr.git"
 PACKAGES["robotour"]="https://github.com/vras-robotour/robotour.git"
 PACKAGES["image_segmentation"]="https://github.com/vras-robotour/image_segmentation.git"
+PACKAGES["rviz_satellite"]="https://github.com/nobleo/rviz_satellite.git"
 
 # ============= END: VARIABLES =============
 
