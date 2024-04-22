@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 SNAP_PYCHARM=/snap/pycharm-professional/current/bin/pycharm.sh
 FREE_PYCHARM=/opt/pycharm/bin/pycharm.sh

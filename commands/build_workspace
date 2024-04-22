@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 (
   cd "${WORKSPACE_PATH}" || exit 1
