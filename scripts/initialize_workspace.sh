@@ -85,6 +85,11 @@ main() {
   # Initialize the workspace
   init_workspace
 
+  # Configure tmux to start with bash by default if there is no user configuration
+  if [ ! -f "$HOME"/.tmux.conf ]; then
+    echo "set-option -g default-shell /bin/bash" > "$HOME"/.tmux.conf
+  fi
+
   # Start the interactive bash
   start_bash "$@"
 }

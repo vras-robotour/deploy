@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -eo pipefail  # Better error handling and exiting on error
 
 print_usage() {
@@ -22,6 +22,7 @@ Options:
     -d|--download:  Update the image before starting the container.
     -u|--username <username>:  Username as which to start the container.
     --nv:        Enable NVIDIA GPU support.
+    tmux:        Start the container in tmux session, if present, must be the last argument.
 EOF
 }
 
@@ -103,6 +104,9 @@ main() {
             nvidia_gpu="--nv"
             shift # past argument
             ;;
+            tmux)
+            break
+            ;;
             *)
             print_usage
             handle_error "Unknown option: $1"
@@ -110,6 +114,11 @@ main() {
             ;;
         esac
     done
+
+    if [[ $# -gt 1 ]]; then
+        print_usage
+        handle_error "Unknown option: $1"
+    fi
 
     echo
     echo "=========== STARTING SINGULARITY CONTAINER ============"
