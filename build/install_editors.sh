@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail  # Better error handling and exiting on error
 
 install_vscode() {

@@ -1,3 +1,3 @@
-#!/bin/bash -e
+#!/bin/bash
 
 source "${WORKSPACE_PATH}/devel/setup.bash"
