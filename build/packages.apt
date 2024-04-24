@@ -62,6 +62,7 @@ ros-noetic-plotjuggler-ros
 ros-noetic-rgbd-launch
 ros-noetic-ros-numpy
 ros-noetic-rplidar-ros
+ros-noetic-rviz-satellite
 ros-noetic-septentrio-gnss-driver
 ros-noetic-teleop-twist-joy
 ros-noetic-teleop-twist-keyboard
