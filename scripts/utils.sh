@@ -266,16 +266,20 @@ local_image_exists() {
 upload_image() {
 	if [ -n "$SSH_PASSWORD" ]; then
 		rsync -P --rsh="sshpass -p ${SSH_PASSWORD} ssh -l ${USERNAME}" "${IMAGES_PATH}/${IMAGE_FILE}" "${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}"
+		rsync -P --rsh="sshpass -p ${SSH_PASSWORD} ssh -l ${USERNAME}" "${IMAGES_PATH}/${METADATA_FILE}" "${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${METADATA_FILE}"
 	else
 		rsync -P "${IMAGES_PATH}/${IMAGE_FILE}" "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}"
+		rsync -P "${IMAGES_PATH}/${METADATA_FILE}" "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${METADATA_FILE}"
 	fi
 }
 
 download_image() {
 	if [ -n "$SSH_PASSWORD" ]; then
 		rsync -P --rsh="sshpass -p ${SSH_PASSWORD} ssh -l ${USERNAME}" "${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}" "${IMAGES_PATH}/${IMAGE_FILE}"
+		rsync -P --rsh="sshpass -p ${SSH_PASSWORD} ssh -l ${USERNAME}" "${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${METADATA_FILE}" "${IMAGES_PATH}/${METADATA_FILE}"
 	else
 		rsync -P "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${IMAGE_FILE}" "${IMAGES_PATH}/${IMAGE_FILE}"
+		rsync -P "${USERNAME}@${REMOTE_SERVER}:${REMOTE_IMAGES_PATH}/${METADATA_FILE}" "${IMAGES_PATH}/${METADATA_FILE}"
 	fi
 }
 
