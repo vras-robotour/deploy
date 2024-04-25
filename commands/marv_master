@@ -1,0 +1,3 @@
+#!/bin/bash
+
+export ROS_MASTER_URI=http://marv-robot:11311

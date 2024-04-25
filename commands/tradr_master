@@ -1,0 +1,3 @@
+#!/bin/bash
+
+export ROS_MASTER_URI=http://ctu-robot:11311

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+export ROS_MASTER_URI=http://spot-3:11311
