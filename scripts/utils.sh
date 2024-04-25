@@ -103,6 +103,7 @@ BASE_NAME="robotour"
 ARCH=$(local_arch) # amd64, jetson, arm64
 
 IMAGE_FILE="${BASE_NAME}_${ARCH}.simg"
+METADATA_FILE="${BASE_NAME}_${ARCH}.json"
 LOG_FILE="${LOGS_PATH}/${BASE_NAME}.log"
 SETUP_FILE="${WORKSPACE_PATH}/devel/setup.bash"
 
@@ -180,70 +181,67 @@ in_singularity() {
 	[ -n "$SINGULARITY_CONTAINER" ]
 }
 
-get_remote_image_version() {
-	if [ -n "$SSH_PASSWORD" ]; then
-		remote_version=$(sshpass -p "${SSH_PASSWORD}" ssh -t ${USERNAME}@${REMOTE_SERVER} \
-			"cd ${REMOTE_IMAGES_PATH}; \
-            singularity inspect ${IMAGE_FILE}" 2>/dev/null |
-			grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
-	else
-		remote_version=$(ssh -t ${USERNAME}@${REMOTE_SERVER} \
-			"cd ${REMOTE_IMAGES_PATH}; \
-            singularity inspect ${IMAGE_FILE}" 2>/dev/null |
-			grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
-	fi
-	echo "${remote_version}"
+get_remote_image_time() {
+    if [ -n "$SSH_PASSWORD" ]; then
+        remote_created_at=$(sshpass -p "${SSH_PASSWORD}" ssh -t ${USERNAME}@${REMOTE_SERVER} \
+            "cat ${REMOTE_IMAGES_PATH}/${METADATA_FILE} 2>/dev/null | jq -r '.created_at // empty'" 2>/dev/null)
+    else
+        remote_created_at=$(ssh -t ${USERNAME}@${REMOTE_SERVER} \
+            "cat ${REMOTE_IMAGES_PATH}/${METADATA_FILE} 2>/dev/null | jq -r '.created_at // empty'" 2>/dev/null)
+    fi
+    # Trim trailing whitespace (including newline characters)
+    remote_created_at=$(echo "${remote_created_at}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    echo "${remote_created_at}"
 }
 
-get_local_image_version() {
-	local_version=$(singularity inspect "${IMAGES_PATH}/${IMAGE_FILE}" 2>/dev/null |
-		grep "Version:" | cut -d ':' -f 2 | tr -d '[:space:]')
-	echo "${local_version}"
+get_local_image_time() {
+    local_created_at=$(cat "${IMAGES_PATH}/${METADATA_FILE}" 2>/dev/null |
+        jq -r '.created_at // empty')
+    echo "${local_created_at}"
 }
 
-compare_versions_for_upload() {
-	local_version=$(get_local_image_version)
-	remote_version=$(get_remote_image_version)
+compare_times_for_upload() {
+    local_time=$(get_local_image_time)
+    remote_time=$(get_remote_image_time)
 
-	echo
-	if [[ "$local_version" == "$remote_version" ]]; then
-		# Versions are equal
-		read_input "The remote image is already up to date (${local_version}). Do you want to continue? [y/N] "
-	elif [[ "$(echo -e "$local_version\n$remote_version" | sort -V | tail -n1)" == "$local_version" ]]; then
-		# Local version is strictly newer
-		read_input "The local image is newer (${local_version}) than the remote one (${remote_version}). Do you want to continue? [y/N] "
-	else
-		# Remote version is strictly newer
-		read_input "The remote image (${remote_version}) is newer than the local one (${local_version}). Do you want to continue? [y/N] "
-	fi
+    local_t=$(date -d "${local_time}" +%s)
+    remote_t=$(date -d "${remote_time}" +%s)
 
-	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-		echo
-		info_log "Aborting the upload."
-		exit 0
-	fi
+    if [[ "$local_t" -eq "$remote_t" ]]; then  # Times are equal
+        read_input "The remote image was created at the same time (${local_time}). Do you want to continue? [y/N] "
+    elif [[ "$local_t" -gt "$remote_t" ]]; then # Local time is strictly newer
+        read_input "The local image was created more recently (${local_time}) than the remote one (${remote_time}). Do you want to continue? [y/N] "
+    else # Remote time is strictly newer
+        read_input "The remote image (${remote_time}) was created more recently than the local one (${local_time}). Do you want to continue? [y/N] "
+    fi
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo
+        info_log "Aborting the upload."
+        exit 0
+    fi
 }
 
-compare_versions_for_download() {
-	local_version=$(get_local_image_version)
-	remote_version=$(get_remote_image_version)
+compare_times_for_download() {
+	    local_time=$(get_local_image_time)
+    remote_time=$(get_remote_image_time)
 
-	if [[ "$local_version" == "$remote_version" ]]; then
-		# Versions are equal
-		read_input "The local image is already up to date (${local_version}). Do you want to continue? [y/N] "
-	elif [[ "$(echo -e "$local_version\n$remote_version" | sort -V | tail -n1)" == "$local_version" ]]; then
-		# Local version is strictly newer
-		read_input "The local image is newer (${local_version}) than the remote one (${remote_version}). Do you want to continue? [y/N] "
-	else
-		# Remote version is strictly newer
-		read_input "The remote image (${remote_version}) is newer than the local one (${local_version}). Do you want to continue? [y/N] "
-	fi
+    local_t=$(date -d "${local_time}" +%s)
+    remote_t=$(date -d "${remote_time}" +%s)
 
-	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-		echo
-		info_log "Aborting the download."
-		exit 0
-	fi
+    if [[ "$local_t" -eq "$remote_t" ]]; then  # Times are equal
+        read_input "The remote image was created at the same time (${local_time}). Do you want to continue? [y/N] "
+    elif [[ "$local_t" -gt "$remote_t" ]]; then # Local time is strictly newer
+        read_input "The local image was created more recently (${local_time}) than the remote one (${remote_time}). Do you want to continue? [y/N] "
+    else # Remote time is strictly newer
+        read_input "The remote image (${remote_time}) was created more recently than the local one (${local_time}). Do you want to continue? [y/N] "
+    fi
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo
+        info_log "Aborting the download."
+        exit 0
+    fi
 }
 
 remote_image_exists() {

@@ -59,7 +59,7 @@ main() {
 
   if [ "$remote_exists" == "true" ]; then
     info_log "Found remote image \e[1;95m${IMAGE_FILE}\e[0m."
-    compare_versions_for_upload
+    compare_times_for_upload
   else
     info_log "The remote image \e[1;95m${IMAGE_FILE}\e[0m does not exist. Uploading a new one."
   fi

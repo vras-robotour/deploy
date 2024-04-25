@@ -6,9 +6,6 @@ From: ros:noetic-perception-focal
     is developed by the Department of Cybernetics, Czech Technical
     University in Prague, Czech Republic.
 
-%labels
-    Version v0.1.2
-
 %setup
     [ -f "/root/.netrc" ] && cp "/root/.netrc" "${SINGULARITY_ROOTFS}/root/.netrc" || true
     mkdir -p $SINGULARITY_ROOTFS/.custom_commands

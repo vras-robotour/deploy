@@ -57,7 +57,7 @@ main() {
 
   if [ "$remote_exists" == "true" ]; then
     info_log "Found the remote image ${IMAGE_FILE}."
-    compare_versions_for_download
+    compare_times_for_download
   else
     error_log "The remote image does not exist."
     exit 1
