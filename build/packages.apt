@@ -59,6 +59,7 @@ ros-noetic-log-view
 ros-noetic-move-base
 ros-noetic-octomap-ros
 ros-noetic-plotjuggler-ros
+ros-noetic-point-cloud-color
 ros-noetic-rgbd-launch
 ros-noetic-ros-numpy
 ros-noetic-rplidar-ros

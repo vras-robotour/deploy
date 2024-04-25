@@ -150,8 +150,6 @@ PACKAGES["naex"]="https://github.com/vras-robotour/naex.git"
 PACKAGES["osm2qr"]="https://github.com/vras-robotour/osm2qr.git"
 PACKAGES["robotour"]="https://github.com/vras-robotour/robotour.git"
 PACKAGES["image_segmentation"]="https://github.com/vras-robotour/image_segmentation.git"
-PACKAGES["point_cloud_color"]="https://github.com/ctu-vras/point_cloud_color.git"
-PACKAGES["point_cloud_transport"]="https://github.com/ctu-vras/point_cloud_transport.git"
 
 # ============= END: VARIABLES =============
 
