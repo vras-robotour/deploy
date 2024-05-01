@@ -20,8 +20,8 @@ The repository contains the following directories and files:
 │   ├── build_workspace
 │   ├── clion
 │   ├── pycharm
-│   ├── source_noetic
-│   ├── source_workspace
+│   ├── src_ros
+│   ├── src_work
 │   └── ...
 ├── images
 ├── logs
@@ -80,5 +80,17 @@ The container contains the following commands:
 - `build_workspace` - builds the workspace
 - `clion` - starts the CLion IDE
 - `pycharm` - starts the PyCharm IDE
-- `source_noetic` - sources the ROS Noetic workspace
-- `source_workspace` - sources the RoboTour workspace
+- `src_ros` - sources the ROS Noetic workspace
+- `src_work` - sources the RoboTour workspace
+- `marv_master` - exports the ROS_MASTER_URI for the Marv robot
+- `spot_master` - exports the ROS_MASTER_URI for the Spot robot
+- `tradr_master` - exports the ROS_MASTER_URI for the Tradr robot
+
+The last five commands must be run in the following way:
+```bash
+source <command>
+```
+or
+```bash
+. <command>
+```
