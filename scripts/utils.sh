@@ -150,6 +150,7 @@ PACKAGES["naex"]="https://github.com/vras-robotour/naex.git"
 PACKAGES["osm2qr"]="https://github.com/vras-robotour/osm2qr.git"
 PACKAGES["robotour"]="https://github.com/vras-robotour/robotour.git"
 PACKAGES["image_segmentation"]="https://github.com/vras-robotour/image_segmentation.git"
+PACKAGES["virtual_bumper"]="https://github.com/vras-robotour/virtual_bumper.git"
 
 # ============= END: VARIABLES =============
 
