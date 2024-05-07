@@ -46,6 +46,8 @@ main() {
       esac
   done
 
+  check_ssh_key_or_prompt_password
+
   local_exists=$(local_image_exists)
   remote_exists=$(remote_image_exists)
 
