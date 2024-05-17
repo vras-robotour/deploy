@@ -25,6 +25,8 @@ install_neovim() {
     sudo add-apt-repository ppa:neovim-ppa/unstable
     sudo apt update
     sudo apt -y install neovim
+
+    git clone https://github.com/aleskucera/lazyvim.git ~/.config/nvim
 }
 
 install_pycharm() {
@@ -40,6 +42,7 @@ install_pycharm() {
 main() {
   install_vscode
   install_sublimetext
+  install_neovim
   install_pycharm
 }
 
