@@ -26,10 +26,9 @@ From: ros:noetic-perception-focal
 
 %post
     apt-get update -y
-    DEBIAN_FRONTEND=noninteractive apt-get install -y wget lsb-release git
+    DEBIAN_FRONTEND=noninteractive xargs -a /.tmp/packages.apt apt-get install -y
 
     bash /.tmp/install_editors.sh
-    DEBIAN_FRONTEND=noninteractive xargs -a /.tmp/packages.apt apt-get install -y
 
     wget -q -O /.tmp/torch-1.11.0a0+gitunknown-cp38-cp38-linux_aarch64.whl \
         https://github.com/ctu-vras/pytorch/releases/download/v1.11.0/torch-1.11.0a0+gitunknown-cp38-cp38-linux_aarch64.whl
