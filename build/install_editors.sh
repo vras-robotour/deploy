@@ -22,6 +22,7 @@ install_sublimetext() {
 }
 
 install_neovim() {
+    sudo apt remove neovim-runtime --purge -y
     sudo add-apt-repository ppa:neovim-ppa/unstable
     sudo apt update
     sudo apt -y install neovim
